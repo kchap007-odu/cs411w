@@ -30,8 +30,8 @@ class NestThermostat(Devices.SmartDevice):
     _locked_temp_max: int = 300
     _previous_hvac_mode: str = ""
     _structure_id: str = "NOT IMPLEMENTED"
-    _sunlight_correction_enabled = False
-    _sunlight_correction_active = False
+    _sunlight_correction_enabled: bool = False
+    _sunlight_correction_active: bool = False
     # All temperature units should be stored in Kelvin.
     _target_temperature: int = 273
     _target_temperature_high: int = 303
@@ -45,7 +45,7 @@ class NestThermostat(Devices.SmartDevice):
         self._device_type = "Thermostat"
         self._logger.debug(
             f"Device {self._device_id} is now a {self._device_type}."
-            )
+        )
 
     @property
     def ambient_temperature(self) -> int:
@@ -78,7 +78,7 @@ class NestThermostat(Devices.SmartDevice):
         """
         self._logger.debug(
             f"Get ambient temperature (C) for device {self._device_id}."
-            )
+        )
         return kelvin_to_celsius(self._ambient_temperature)
 
     @property
@@ -92,7 +92,7 @@ class NestThermostat(Devices.SmartDevice):
         """
         self._logger.debug(
             f"Get ambient temperature (F) for device {self._device_id}."
-            )
+        )
         return celsius_to_fahrenheit(self.ambient_temperature_c)
 
     def as_dict(self) -> dict:
@@ -109,7 +109,7 @@ class NestThermostat(Devices.SmartDevice):
             "temperature": self.ambient_temperature,
             "temperature_scale": self.temperature_scale,
             "hvac_mode": self.hvac_mode
-            }
+        }
 
     @property
     def can_heat(self) -> bool:
@@ -123,7 +123,7 @@ class NestThermostat(Devices.SmartDevice):
         """
         self._logger.debug(
             f"Get heating capability for device {self._device_id}."
-            )
+        )
         return True
 
     @property
@@ -165,7 +165,7 @@ class NestThermostat(Devices.SmartDevice):
         if self._temperature_scale == "F":
             self._eco_temperature_high = celsius_to_kelvin(
                 fahrenheit_to_celsius(value)
-                )
+            )
         elif self._temperature_scale == "C":
             self._eco_temperature_high = celsius_to_kelvin(value)
 
@@ -382,7 +382,7 @@ class NestThermostat(Devices.SmartDevice):
         self._is_locked = value
         self._logger.debug(
             f"Set locked status of device {self._device_id} to {value}."
-            )
+        )
 
     @property
     def is_using_emergency_heat(self) -> bool:
@@ -396,7 +396,7 @@ class NestThermostat(Devices.SmartDevice):
         # TODO: Figure out how to implement this.
         self._logger.debug(
             f"Get emergency heat status of device {self._device_id}"
-            )
+        )
         return False
 
     @property
@@ -419,7 +419,7 @@ class NestThermostat(Devices.SmartDevice):
         """
         self._logger.debug(
             f"Set value of label for device {self._device_id} to {value}."
-            )
+        )
         self._label = value
 
     @property

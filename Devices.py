@@ -27,15 +27,15 @@ class SmartDevice:
     name (str): The user-defined name of the device.
     logger (logging.Logger): The logger to user for logging internal events.
     """
-    _device_id = "00000000000000000000000000000000"
-    _device_type = "none"
-    _is_online = True
-    _location = "none"
-    _software_version = datetime.datetime.strptime(
+    _device_id: str = "00000000000000000000000000000000"
+    _device_type: str = "none"
+    _is_online: bool = True
+    _location: str = "none"
+    _software_version: datetime.datetime = datetime.datetime.strptime(
         "1970.01.01", "%Y.%m.%d"
     )
-    _status = "off"
-    last_connected = 0.0
+    _status: str = "off"
+    last_connected: datetime.datetime = 0.0
 
     def __init__(self, name: str = "unnamed", location: str = "none",
                  device_id: str = None, logger: logging.Logger = LOGGER):
