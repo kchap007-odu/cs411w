@@ -27,7 +27,7 @@ class SmartDevice:
     name (str): The user-defined name of the device.
     logger (logging.Logger): The logger to user for logging internal events.
     """
-    _device_id: str = "00000000000000000000000000000000"
+    _device_id: str = "0" * 32
     _device_type: str = "none"
     _is_online: bool = True
     _location: str = "none"
