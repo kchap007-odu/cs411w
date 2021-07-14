@@ -9,23 +9,29 @@ SOFTWARE_VERSION = datetime.datetime.strptime(
     "2021.07.13", "%Y.%m.%d"
 )
 LOGGER = logging.getLogger(__name__)
+LOGGER.setLevel(logging.DEBUG)
+formatter = logging.Formatter(
+    '%(asctime)s - %(filename)s - %(lineno)s - %(levelname)s - %(message)s')
 fh = logging.FileHandler('SmartDevice.log')
 fh.setLevel(logging.DEBUG)
+fh.setFormatter(formatter)
 
 ch = logging.StreamHandler()
 ch.setLevel(logging.ERROR)
+ch.setFormatter(formatter)
 LOGGER.addHandler(fh)
 LOGGER.addHandler(ch)
 
 
 class SmartDevice:
-    """
-    The class from which all smart device simulator objects will inherit.
-    Parameters common to all smart devices are to be defined here.
+    """The class from which all smart device simulator objects
+    will inherit. Parameters common to all smart devices are to be
+    defined here.
 
     Parameters:
     name (str): The user-defined name of the device.
-    logger (logging.Logger): The logger to user for logging internal events.
+    logger (logging.Logger): The logger to user for logging internal
+    events.
     """
     _device_id: str = "0" * 32
     _device_type: str = "none"
@@ -51,11 +57,16 @@ class SmartDevice:
             self._device_id = hashlib.md5(
                 bytes(str(int(time.time()*1000)), encoding="utf-8")
             ).hexdigest()
+        self._logger.debug(
+            f"Created device {self._device_id} with name -- "
+            + f"{self._name}, software version -- "
+            + f"{self._software_version}, "
+            + f"location -- {self._location}."
+        )
 
     @property
     def device_id(self) -> str:
-        """
-        Getter for unique device identifier.
+        """Getter for unique device identifier.
 
         Returns:
         str: The unique identifier of the device.
@@ -67,8 +78,7 @@ class SmartDevice:
 
     @property
     def name_long(self) -> str:
-        """
-        Getter for long name.
+        """Getter for long name.
 
         Returns:
         str: The long form name of the smart device.
@@ -77,8 +87,7 @@ class SmartDevice:
 
     @property
     def name(self) -> str:
-        """
-        Getter for device name.
+        """Getter for device name.
 
         Returns:
         str: The device name.
@@ -87,8 +96,7 @@ class SmartDevice:
 
     @property
     def software_version(self) -> str:
-        """
-        Getter for software version.
+        """Getter for software version.
 
         Returns:
         str: The software version.
@@ -97,8 +105,7 @@ class SmartDevice:
 
     @property
     def status(self) -> str:
-        """
-        Getter for status.
+        """Getter for status.
 
         Returns:
         str: The current status of the device.
@@ -109,14 +116,18 @@ class SmartDevice:
         return self._status
 
     def set_status(self, status: str = "off"):
-        """
-        Setter method for status
+        """Setter method for status
 
         Parameters:
         status (str): The target status of the device. Must be "on",
         "off", or "timer".
         """
         if status in STATUSES:
-            self._logger.info(f"Set status of device {self._device_id} \
-                to {status}.")
+            self._logger.info(
+                f"Set status of device {self._device_id}"
+                + f"to {status}.")
             self._status = status
+
+
+if __name__ == "__main__":
+    pass
