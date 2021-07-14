@@ -41,6 +41,7 @@ class SmartDevice:
                  device_id: str = None, logger: logging.Logger = LOGGER):
         self._name = name
         self._software_version = SOFTWARE_VERSION
+        self._location = location
         self._logger = logger
         if device_id is not None:
             self._device_id = device_id
@@ -72,7 +73,7 @@ class SmartDevice:
         Returns:
         str: The long form name of the smart device.
         """
-        return f"{self._location} {self._device_type} ({self._location})"
+        return f"{self._name} {self._device_type} ({self._location})"
 
     @property
     def name(self) -> str:
