@@ -1,3 +1,4 @@
 #!/bin/bash
-export FLASK_APP=hello
+BASEDIR=$(dirname "$0")
+export FLASK_APP=$BASEDIR/hello
 flask run
