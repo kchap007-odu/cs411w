@@ -106,7 +106,8 @@ class NestThermostat(Devices.SmartDevice):
             "device_id": self.device_id,
             "status": self._status,
             "humidity": self.humidity,
-            "temperature": self.ambient_temperature,
+            "ambient_temperature": self.ambient_temperature,
+            "target_temperature": self.target_temperature,
             "temperature_scale": self.temperature_scale,
             "hvac_mode": self.hvac_mode
         }
@@ -530,8 +531,60 @@ class NestThermostat(Devices.SmartDevice):
 
     @property
     def target_temperature(self) -> int:
-        # TODO: Fill out this section.
-        return None
+        """
+        Selects the appropriate target temperature based on HVAC mode
+        and temperature scale.
+
+        Returns:
+            int: The target temperature in units specified by
+            temperature scale.
+        """
+        # TODO: Find a better way to do this. This is ugly.
+        if self._hvac_mode == "cool":
+            if self.temperature_scale == "C":
+                return self.target_temperature_low_c
+            elif self.temperature_scale == "F":
+                return self.target_temperature_low_f
+            else:
+                return self._target_temperature_low
+        elif self._hvac_mode == "heat":
+            if self.temperature_scale == "C":
+                return self.target_temperature_high_c
+            elif self.temperature_scale == "F":
+                return self.target_temperature_high_f
+            else:
+                return self._target_temperature_high
+        elif self._hvac_mode == "heat-cool":
+            # TODO: Fix this so that heat or cool is chosen.
+            if self.ambient_temperature_c > self.target_temperature_c:
+                if self.temperature_scale == "C":
+                    return self.target_temperature_low_c
+                elif self.temperature_scale == "F":
+                    return self.target_temperature_low_f
+                else:
+                    return self._target_temperature_low
+            elif self.ambient_temperature_c < self.target_temperature_c:
+                if self.temperature_scale == "C":
+                    return self.target_temperature_high_c
+                elif self.temperature_scale == "F":
+                    return self.target_temperature_high_f
+                else:
+                    return self._target_temperature_high
+        elif self._hvac_mode == "eco":
+            if self.ambient_temperature_c > self.target_temperature_c:
+                if self.temperature_scale == "C":
+                    return self.eco_temperature_low_c
+                elif self.temperature_scale == "F":
+                    return self.eco_temperature_low_f
+                else:
+                    return self._eco_temperature_low
+            elif self.ambient_temperature_c < self.target_temperature_c:
+                if self.temperature_scale == "C":
+                    return self.eco_temperature_high_c
+                elif self.temperature_scale == "F":
+                    return self.eco_temperature_high_f
+                else:
+                    return self._eco_temperature_high
 
     @property
     def target_temperature_f(self) -> int:
