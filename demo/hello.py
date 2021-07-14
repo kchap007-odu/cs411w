@@ -4,12 +4,14 @@ from flask import jsonify
 
 app = Flask(__name__)
 
+
 @app.route("/", methods=['GET', 'POST'])
 def hello_world():
     if request.method == 'GET':
         return "<p>Hello, World!</p>"
     elif request.method == 'POST':
         return "<h1>POSTED!</h1>"
+
 
 @app.route("/device", methods=['GET', 'POST'])
 def json_api_test():
