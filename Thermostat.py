@@ -41,7 +41,7 @@ class NestThermostat(Devices.SmartDevice):
     _where_name: str = "NOT YET IMPLEMENTED"
 
     def __init__(self, location: str = "none"):
-        super().__init__()
+        super().__init__(name="Fake", location="somewhere")
         self._device_type = "Thermostat"
         self._logger.debug(
             f"Device {self._device_id} is now a {self._device_type}."
@@ -104,6 +104,7 @@ class NestThermostat(Devices.SmartDevice):
         self._logger.debug(f"Get device {self._device_id} as dictionary.")
         return {
             "device_id": self.device_id,
+            "name": self.name_long,
             "status": self._status,
             "humidity": self.humidity,
             "ambient_temperature": self.ambient_temperature,
@@ -776,6 +777,9 @@ def fahrenheit_to_celsius(value: int = 0) -> int:
 
 
 if __name__ == "__main__":
+    """
+    The driver code for running the module
+    """
     thermo = NestThermostat(location="Upstairs")
     thermo.set_status("on")
     thermo.set_hvac_mode("cool")
