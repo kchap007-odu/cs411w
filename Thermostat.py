@@ -1,4 +1,5 @@
 import datetime
+import locale
 
 import Devices
 
@@ -19,16 +20,16 @@ class NestThermostat(Devices.SmartDevice):
     _ambient_temperature: float = 293
     _eco_temperature_low: float = 297
     _eco_temperature_high: float = 299
-    _fan_timer_duration: datetime.datetime = None
+    _fan_timer_duration: datetime.datetime
     _has_fan: bool = True
     _humidity: float = 0.5
     _hvac_mode: str = "off"
     _is_locked: bool = False
-    _locale: str = "NOT IMPLEMENTED"
+    _locale: str
     _locked_temp_min: float = 293
     _locked_temp_max: float = 300
     _previous_hvac_mode: str = ""
-    _structure_id: str = "NOT IMPLEMENTED"
+    _structure_id: str
     _sunlight_correction_enabled: bool = False
     _sunlight_correction_active: bool = False
     # All temperature units should be stored in Kelvin.
@@ -36,13 +37,14 @@ class NestThermostat(Devices.SmartDevice):
     _target_temperature_high: float = 303
     _target_temperature_low: float = 293
     _temperature_scale: str = "C"
-    _where_id: str = "NOT YET IMPLEMENTED"
-    _where_name: str = "NOT YET IMPLEMENTED"
+    _where_id: str
+    _where_name: str
 
     def __init__(self, location: str = "none", name: str = "none"):
         super().__init__(name=name, location=location)
         self.set_fan_timer_duration()
         self._device_type = "Thermostat"
+        self._locale = locale.getlocale()[0]
         self._logger.debug(
             f"Device {self._device_id} is now a {self._device_type}."
         )
