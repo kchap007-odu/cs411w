@@ -1,4 +1,7 @@
-import datetime
-import locale
+import random
 
-import Devices
+# energy usage
+watts = random.randint(100,400)
+print(watts," watts")
+
+
