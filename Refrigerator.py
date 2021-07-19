@@ -1,5 +1,5 @@
-import random
 import datetime
+from random import randrange
 
 
 class Refrigerator:
@@ -15,3 +15,13 @@ class Refrigerator:
         self.freezer_last_on_time = freezer_last_on_time
         self.freezer_last_off_time = freezer_last_off_time
         self.energy_use = energy_use
+
+# random times for fridge_last_on_time and fridge_last_off_time
+hours = randrange(1, 25)
+minutes = randrange(1, 61)
+seconds = randrange(1, 61)
+
+print(f"First Time on {hours}:{minutes}:{seconds}")
+print(f"First Time off {hours}:{minutes}:{seconds}")
+print(f"Second Time on {hours}:{minutes}:{seconds}")
+print(f"Second Time off {hours}:{minutes}:{seconds}")
