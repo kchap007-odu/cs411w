@@ -1,4 +1,4 @@
-# Setting up Flask
+# Installing Flask
 
 - Windows
   python -m venv venv
@@ -6,6 +6,10 @@
   pip3 install --trusted-host pypi.org flask
 
 - Linux
+  mkdir venv
+  python3 -m venv venv
+  venv/bin/activate
+  pip install flask
 
 # Setting up server
 
