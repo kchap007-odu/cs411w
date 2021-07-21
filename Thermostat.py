@@ -53,7 +53,7 @@ class NestThermostat(Devices.SmartDevice):
     def ambient_temperature(self) -> int:
         """Getter method for ambient temperature.
 
-        Return:
+        Returns:
         int: The current temperature as measured at the device, in
         Kelvin.
         """
@@ -112,7 +112,30 @@ class NestThermostat(Devices.SmartDevice):
             "target_temperature": self.target_temperature,
             "temperature_scale": self.temperature_scale,
             "hvac_mode": self.hvac_mode,
-            "fan_timer_timeout": self.fan_timer_timeout.strftime("%Y/%m/%d %H:%M:%S")
+            "fan_timer_timeout":
+                self.fan_timer_timeout.strftime("%Y/%m/%d %H:%M:%S")
+        }
+
+    def get_settable_parameters(self) -> dict:
+        return {
+            "device_type": self.device_type,
+            "hvac_mode": self.hvac_mode,
+            "previous_hvac_mode": self.previous_hvac_mode,
+            "target_temperature_high": self.target_temperature_high,
+            "target_temperatue_low": self.target_temperature_low,
+            "locked_temp_max": self.locked_temp_max,
+            "locked_temp_min": self.locked_temp_min,
+            "eco_temperature_high": self.eco_temperature_high,
+            "eco_temperature_low": self.eco_temperature_low,
+            "temperature_scale": self.temperature_scale,
+            "has_fan": self.has_fan,
+            "is_locked": self.is_locked,
+            "fan_timer_duration": int(self.fan_timer_duration.seconds / 60),
+            "name": self.name,
+            "location": self.location,
+            "device_id": self.device_id,
+            "sunlight_correction_enabled": self.sunlight_correction_enabled,
+            "sunlight_correction_active": self.sunlight_correction_active
         }
 
     @property
@@ -121,7 +144,7 @@ class NestThermostat(Devices.SmartDevice):
         thermostat is capable of heating. For simulation purposes
         this is always true.
 
-        Returns
+        Returns:
         bool: Always true.
         """
         self._logger.debug(
@@ -135,7 +158,7 @@ class NestThermostat(Devices.SmartDevice):
         thermostat is capable of cooling. For simulation purposes
         this is always true.
 
-        Returns
+        Returns:
         bool: Always true.
         """
         self._logger.debug(
@@ -166,6 +189,15 @@ class NestThermostat(Devices.SmartDevice):
             f"Get high eco temperature (C) for device {self._device_id}."
         )
         return kelvin_to_celsius(self._eco_temperature_high)
+
+    @property
+    def eco_temperature_high(self) -> int:
+        if self.temperature_scale == "C":
+            return self.eco_temperature_high_c
+        elif self.temperature_scale == "F":
+            return self.eco_temperature_high_f
+        else:
+            return self._eco_temperature_high
 
     def set_eco_temperature_high(self, value: int = 0):
         """Setter for high eco temperature value. Assumes set units are
@@ -207,6 +239,15 @@ class NestThermostat(Devices.SmartDevice):
         )
         return kelvin_to_celsius(self._eco_temperature_low)
 
+    @property
+    def eco_temperature_low(self) -> int:
+        if self.temperature_scale == "C":
+            return self.eco_temperature_low_c
+        elif self.temperature_scale == "F":
+            return self.eco_temperature_low_f
+        else:
+            return self._eco_temperature_low
+
     def set_eco_temperature_low(self, value: int = 0):
         """Setter for low eco temperature value. Assumes set units are
         the same as the current system units.
@@ -227,7 +268,7 @@ class NestThermostat(Devices.SmartDevice):
     def fan_timer_active(self) -> bool:
         """Boolean indicating whether the fan timer is active.
 
-        Returns
+        Returns:
         bool: True if fan timer is active, false otherwise.
         """
         self._logger.debug(
@@ -249,7 +290,7 @@ class NestThermostat(Devices.SmartDevice):
         return datetime.datetime.now() + self.fan_timer_duration
 
     @property
-    def fan_timer_duration(self) -> datetime.datetime:
+    def fan_timer_duration(self) -> datetime.timedelta:
         """Getter for fan timer duration.
 
         Returns:
@@ -278,11 +319,19 @@ class NestThermostat(Devices.SmartDevice):
         thermostat has a fan. For simulation purposes this is
         always true.
 
-        Returns
+        Returns:
         bool: Always true.
         """
         self._logger.debug(f"Get fan status for device {self._device_id}.")
         return True
+
+    def set_has_fan(self, value: bool = True):
+        """Setter for has_fan property.
+
+        Parameters:
+        value (bool): The value to set has_fan to.
+        """
+        self._has_fan = value
 
     @property
     def has_leaf(self) -> bool:
@@ -326,22 +375,22 @@ class NestThermostat(Devices.SmartDevice):
         "heat", "heat-cool", or "off".
         """
         if value in HVAC_MODES:
-            self._logger.info(
-                f"Set previous HVAC value of device {self._device_id}"
-                + f" to {self._hvac_mode}"
-            )
-            self._previous_hvac_mode = self._hvac_mode
+            self.set_previous_hvac_mode(self._hvac_mode)
             self._logger.info(
                 f"Set HVAC mode of device {self._device_id} to {value}."
             )
             self._hvac_mode = value
-        # TODO: Raise an error if passed an invalid value
+        else:
+            self._logger.warning(
+                f"Device {self._device_id} hvac_mode "
+                + f"cannot take a value of {value}"
+            )
 
     @property
     def is_cooling(self) -> bool:
         """Boolean indicating whether the system is actively cooling.
 
-        Returns
+        Returns:
         bool: True if current temperature is greater than target
         temperature.
         """
@@ -354,7 +403,7 @@ class NestThermostat(Devices.SmartDevice):
     def is_heating(self) -> bool:
         """Boolean indicating whether the system is actively heating.
 
-        Returns
+        Returns:
         bool: True if current temperature is less than target
         temperature.
         """
@@ -455,6 +504,15 @@ class NestThermostat(Devices.SmartDevice):
         )
         return celsius_to_fahrenheit(self.locked_temp_max_c)
 
+    @property
+    def locked_temp_max(self) -> int:
+        if self.temperature_scale == "C":
+            return self.locked_temp_max_c
+        elif self.temperature_scale == "F":
+            return self.locked_temp_max_f
+        else:
+            return self._locked_temp_max
+
     def set_locked_temp_max(self, value: int = 0):
         """Setter for high locked temperature value. Assumes set units
         are the same as the current system units.
@@ -495,6 +553,15 @@ class NestThermostat(Devices.SmartDevice):
         )
         return celsius_to_fahrenheit(self.locked_temp_min_c)
 
+    @property
+    def locked_temp_min(self) -> int:
+        if self.temperature_scale == "C":
+            return self.locked_temp_min_c
+        elif self.temperature_scale == "F":
+            return self.locked_temp_min_f
+        else:
+            return self._locked_temp_min
+
     def set_locked_temp_min(self, value: int = 0):
         """Setter for high locked temperature value. Assumes set units
         are the same as the current system units.
@@ -523,6 +590,20 @@ class NestThermostat(Devices.SmartDevice):
         )
         return self._previous_hvac_mode
 
+    def set_previous_hvac_mode(self, value: str):
+        """Setter for previous hvac mode.
+
+        Parameters:
+        value(str): The value to set previous hvac mode to.
+        """
+
+        if value in HVAC_MODES:
+            self._logger.info(
+                "Set previous HVAC mode of device "
+                + f"{self._device_id} to {value}."
+            )
+            self._previous_hvac_mode = value
+
     @property
     def sunlight_correction_enabled(self) -> bool:
         """Getter for sunlight correction enabled.
@@ -531,10 +612,18 @@ class NestThermostat(Devices.SmartDevice):
         bool: Whether sunlight correction is enabled.
         """
         self._logger.debug(
-            f"Get sunlight correction enable "
+            "Get sunlight correction enable "
             + f"status for device {self._device_id}."
         )
         return self._sunlight_correction_enabled
+
+    def set_sunlight_correction_enabled(self, value: bool = False):
+        """Setter for sunlight correction enable.
+
+        Parameters:
+        value (bool): The value to set sunlight correction to.
+        """
+        self._sunlight_correction_enabled = value
 
     @property
     def sunlight_correction_active(self) -> bool:
@@ -544,10 +633,18 @@ class NestThermostat(Devices.SmartDevice):
         bool: Whether the sunlight correction is active.
         """
         self._logger.debug(
-            f"Get sunlight correction active "
+            "Get sunlight correction active "
             + f"status for device {self._device_id}."
         )
         return self._sunlight_correction_active
+
+    def set_sunlight_correction_active(self, value: bool = False):
+        """Setter for sunlight correction active status.
+
+        Parameters:
+        value (bool): Value to set sunlight correction status to.
+        """
+        self._sunlight_correction_active = value
 
     @property
     def target_temperature(self) -> int:
@@ -560,50 +657,20 @@ class NestThermostat(Devices.SmartDevice):
         """
         # TODO: Find a better way to do this. This is ugly.
         if self._hvac_mode == "cool":
-            if self.temperature_scale == "C":
-                return self.target_temperature_low_c
-            elif self.temperature_scale == "F":
-                return self.target_temperature_low_f
-            else:
-                return self._target_temperature_low
+            return self.target_temperature_low
         elif self._hvac_mode == "heat":
-            if self.temperature_scale == "C":
-                return self.target_temperature_high_c
-            elif self.temperature_scale == "F":
-                return self.target_temperature_high_f
-            else:
-                return self._target_temperature_high
+            return self.target_temperature_high
         elif self._hvac_mode == "heat-cool":
             # TODO: Fix this so that heat or cool is chosen.
             if self.ambient_temperature_c > self.target_temperature_c:
-                if self.temperature_scale == "C":
-                    return self.target_temperature_low_c
-                elif self.temperature_scale == "F":
-                    return self.target_temperature_low_f
-                else:
-                    return self._target_temperature_low
+                return self.target_temperature_low
             elif self.ambient_temperature_c < self.target_temperature_c:
-                if self.temperature_scale == "C":
-                    return self.target_temperature_high_c
-                elif self.temperature_scale == "F":
-                    return self.target_temperature_high_f
-                else:
-                    return self._target_temperature_high
+                return self.target_temperature_high
         elif self._hvac_mode == "eco":
             if self.ambient_temperature_c > self.target_temperature_c:
-                if self.temperature_scale == "C":
-                    return self.eco_temperature_low_c
-                elif self.temperature_scale == "F":
-                    return self.eco_temperature_low_f
-                else:
-                    return self._eco_temperature_low
+                return self.eco_temperature_low
             elif self.ambient_temperature_c < self.target_temperature_c:
-                if self.temperature_scale == "C":
-                    return self.eco_temperature_high_c
-                elif self.temperature_scale == "F":
-                    return self.eco_temperature_high_f
-                else:
-                    return self._eco_temperature_high
+                return self.eco_temperature_high
 
     @property
     def target_temperature_f(self) -> int:
@@ -628,6 +695,15 @@ class NestThermostat(Devices.SmartDevice):
             f"Get target temperature (C) for device {self._device_id}."
         )
         return kelvin_to_celsius(self._target_temperature)
+
+    @property
+    def target_temperature_high(self) -> int:
+        if self.temperature_scale == "C":
+            return self.target_temperature_high_c
+        elif self.temperature_scale == "F":
+            return self.target_temperature_high_f
+        else:
+            return self._target_temperature_high
 
     @property
     def target_temperature_high_f(self) -> int:
@@ -712,6 +788,15 @@ class NestThermostat(Devices.SmartDevice):
             self._target_temperature_low = value
 
     @property
+    def target_temperature_low(self) -> int:
+        if self.temperature_scale == "C":
+            return self.target_temperature_low_c
+        elif self.temperature_scale == "F":
+            return self.target_temperature_low_f
+        else:
+            return self._target_temperature_low
+
+    @property
     def temperature_scale(self) -> str:
         """Getter method for units.
 
@@ -756,7 +841,7 @@ class NestThermostat(Devices.SmartDevice):
         """
         # TODO: Figure out how to implement this.
         self._logger.debug(
-            f"Get value of time to target training "
+            "Get value of time to target training "
             + "for device {self._device_id}."
         )
         return TRAINING[0]
