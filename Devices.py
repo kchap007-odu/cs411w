@@ -8,6 +8,7 @@ STATUSES = ["on", "off", "timer"]
 SOFTWARE_VERSION = datetime.datetime.strptime(
     "2021.07.13", "%Y.%m.%d"
 )
+
 LOGGER = logging.getLogger(__name__)
 LOGGER.setLevel(logging.DEBUG)
 formatter = logging.Formatter(
@@ -47,7 +48,7 @@ class SmartDevice:
                  device_id: str = None, logger: logging.Logger = LOGGER):
         self._name = name
         self._software_version = SOFTWARE_VERSION
-        self._location = location
+        self.set_location(location)
         self._logger = logger
         if device_id is not None:
             self._device_id = device_id
@@ -76,6 +77,48 @@ class SmartDevice:
         )
         return self._device_id
 
+    def set_device_id(self, value: str = ""):
+        """Setter for device_id.
+
+        Parameters:
+        value (str): The value to set device_id to.
+        """
+        self._device_id = value
+
+    @property
+    def device_type(self) -> str:
+        """Getter for device type.
+
+        Returns:
+        str: the type of the device.
+        """
+        return self._device_type
+
+    def set_device_type(self, type: str = "none"):
+        """Setter for device type.
+
+        Parameters:
+        type (str): The type of the device.
+        """
+        self._device_type = type
+
+    @property
+    def location(self) -> str:
+        """Getter for location.
+
+        Returns:
+        (str): The location of the device.
+        """
+        return self._location
+
+    def set_location(self, value: str = "none"):
+        """Setter for location attribute.
+
+        Parameters:
+        value(str): The value to set location to.
+        """
+        self._location = value
+
     @property
     def name_long(self) -> str:
         """Getter for long name.
@@ -93,6 +136,14 @@ class SmartDevice:
         str: The device name.
         """
         return self._name
+
+    def set_name(self, value: str = ""):
+        """Setter method for device name.
+
+        Parameters:
+        value (str): The value to set name to.
+        """
+        self._name = value
 
     @property
     def software_version(self) -> str:
@@ -116,7 +167,7 @@ class SmartDevice:
         return self._status
 
     def set_status(self, status: str = "off"):
-        """Setter method for status
+        """Setter method for status.
 
         Parameters:
         status (str): The target status of the device. Must be "on",
