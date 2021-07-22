@@ -2,7 +2,7 @@ from flask import Flask
 # from flask import request
 # from flask import jsonify
 
-import Thermostat
+from devices import Thermostat
 
 app = Flask(__name__)
 

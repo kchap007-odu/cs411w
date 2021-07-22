@@ -3,7 +3,7 @@ import logging
 
 from typing import List, Union
 
-import Thermostat
+from devices import Thermostat
 import Devices
 import Light
 

@@ -1,7 +1,7 @@
 import unittest
 import datetime
 
-import Thermostat
+from devices import Thermostat
 
 
 class TestThermostats(unittest.TestCase):
