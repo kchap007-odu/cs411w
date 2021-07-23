@@ -12,6 +12,17 @@ class TestThermostats(unittest.TestCase):
         t = Thermostat.NestThermostat(name="Nest", location="Living Room")
         self.assertEqual(t.name_long, "Nest Thermostat (Living Room)")
 
+    def test_multiple_instances(self):
+        instance_one = Thermostat.NestThermostat()
+        instance_two = Thermostat.NestThermostat()
+
+        instance_one.set_is_locked(False)
+        self.assertFalse(instance_one.is_locked)
+        instance_two.set_is_locked(True)
+        self.assertTrue(instance_two.is_locked)
+        self.assertFalse(instance_one.is_locked)
+        self.assertTrue(instance_one.is_locked != instance_two.is_locked)
+
     def test_set_temperature_scale(self):
         t = Thermostat.NestThermostat()
 
@@ -27,10 +38,10 @@ class TestThermostats(unittest.TestCase):
     def test_set_fan_timer_duration(self):
         t = Thermostat.NestThermostat()
 
-        t.set_fan_timer_duration(value=10)
+        t.set_fan_timer_duration(minutes=10)
         self.assertEqual(t.fan_timer_duration, datetime.timedelta(minutes=10))
 
-        t.set_fan_timer_duration(value=60)
+        t.set_fan_timer_duration(minutes=60)
         self.assertEqual(t.fan_timer_duration, datetime.timedelta(minutes=60))
 
     def test_set_eco_temperature_high(self):
