@@ -1,78 +1,85 @@
 import unittest
 import datetime
 
+from hamcrest import assert_that, close_to, contains_string, equal_to, is_,\
+    is_not, string_contains_in_order
+
 from devices import Thermostat
+
+
+TOLERANCE = 0.1
 
 
 class TestThermostats(unittest.TestCase):
     def test_constructor(self):
         t = Thermostat.NestThermostat()
-        self.assertEqual(t.name_long, "none Thermostat (none)")
+        assert_that(t.name_long, string_contains_in_order(
+            "none", "Thermostat", "none"))
 
         t = Thermostat.NestThermostat(name="Nest", location="Living Room")
-        self.assertEqual(t.name_long, "Nest Thermostat (Living Room)")
+        assert_that(t.name_long, string_contains_in_order(
+            "Nest", "Thermostat", "Living Room"))
 
     def test_multiple_instances(self):
         instance_one = Thermostat.NestThermostat()
         instance_two = Thermostat.NestThermostat()
 
         instance_one.set_is_locked(False)
-        self.assertFalse(instance_one.is_locked)
+        assert_that(instance_one.is_locked, is_(False))
         instance_two.set_is_locked(True)
-        self.assertTrue(instance_two.is_locked)
-        self.assertFalse(instance_one.is_locked)
-        self.assertTrue(instance_one.is_locked != instance_two.is_locked)
+
+        assert_that(instance_two.is_locked, is_(True))
+        assert_that(instance_one.is_locked, is_(False))
+        assert_that(instance_one.is_locked, is_not(instance_two.is_locked))
 
     def test_set_temperature_scale(self):
         t = Thermostat.NestThermostat()
 
-        t.set_temperature_scale("F")
-        self.assertEqual(t.temperature_scale, "F")
+        scales = Thermostat.TEMPERATURE_SCALES
 
-        t.set_temperature_scale("C")
-        self.assertEqual(t.temperature_scale, "C")
-
-        t.set_temperature_scale("K")
-        self.assertEqual(t.temperature_scale, "K")
+        for scale in scales:
+            t.set_temperature_scale(scale)
+            assert_that(t.temperature_scale, is_(equal_to(scale)))
 
     def test_set_fan_timer_duration(self):
         t = Thermostat.NestThermostat()
 
-        t.set_fan_timer_duration(minutes=10)
-        self.assertEqual(t.fan_timer_duration, datetime.timedelta(minutes=10))
+        durations = [10, 60]
 
-        t.set_fan_timer_duration(minutes=60)
-        self.assertEqual(t.fan_timer_duration, datetime.timedelta(minutes=60))
+        for duration in durations:
+            t.set_fan_timer_duration(minutes=duration)
+            assert_that(t.fan_timer_duration, is_(
+                equal_to(datetime.timedelta(minutes=duration))))
 
     def test_set_eco_temperature_high(self):
         t = Thermostat.NestThermostat()
 
         t.set_temperature_scale("F")
         t.set_eco_temperature_high(value=70)
-        self.assertAlmostEqual(t.eco_temperature_high_f, 70)
+        assert_that(t.eco_temperature_high_f, close_to(70, TOLERANCE))
 
         t.set_temperature_scale("C")
         t.set_eco_temperature_high(value=30)
-        self.assertAlmostEqual(t.eco_temperature_high_c, 30)
+        assert_that(t.eco_temperature_high_c, close_to(30, TOLERANCE))
 
         t.set_temperature_scale("K")
         t.set_eco_temperature_high(value=290)
-        self.assertAlmostEqual(t._eco_temperature_high, 290)
+        assert_that(t._eco_temperature_high, close_to(290, TOLERANCE))
 
     def test_set_eco_temperature_low(self):
         t = Thermostat.NestThermostat()
 
         t.set_temperature_scale("F")
         t.set_eco_temperature_low(value=70)
-        self.assertAlmostEqual(t.eco_temperature_low_f, 70)
+        assert_that(t.eco_temperature_low_f, close_to(70, TOLERANCE))
 
         t.set_temperature_scale("C")
         t.set_eco_temperature_low(value=30)
-        self.assertAlmostEqual(t.eco_temperature_low_c, 30)
+        assert_that(t.eco_temperature_low_c, close_to(30, TOLERANCE))
 
         t.set_temperature_scale("K")
         t.set_eco_temperature_low(value=290)
-        self.assertAlmostEqual(t._eco_temperature_low, 290)
+        assert_that(t._eco_temperature_low, close_to(290, TOLERANCE))
 
     def test_set_hvac_mode(self):
         t = Thermostat.NestThermostat()
@@ -81,130 +88,119 @@ class TestThermostats(unittest.TestCase):
         self.assertEqual(t.hvac_mode, "off")
         self.assertEqual(t.previous_hvac_mode, "")
 
-        t.set_hvac_mode(value="cool")
-        self.assertEqual(t.hvac_mode, "cool")
-        self.assertEqual(t.previous_hvac_mode, "off")
+        previous = t.hvac_mode
 
-        t.set_hvac_mode(value="heat")
-        self.assertEqual(t.hvac_mode, "heat")
-        self.assertEqual(t.previous_hvac_mode, "cool")
-
-        t.set_hvac_mode(value="eco")
-        self.assertEqual(t.hvac_mode, "eco")
-        self.assertEqual(t.previous_hvac_mode, "heat")
-
-        t.set_hvac_mode(value="heat-cool")
-        self.assertEqual(t.hvac_mode, "heat-cool")
-        self.assertEqual(t.previous_hvac_mode, "eco")
-
-        t.set_hvac_mode(value="off")
-        self.assertEqual(t.hvac_mode, "off")
-        self.assertEqual(t.previous_hvac_mode, "heat-cool")
+        modes = Thermostat.HVAC_MODES
+        for mode in modes:
+            t.set_hvac_mode(value=mode)
+            assert_that(t.hvac_mode, is_(mode))
+            assert_that(t.previous_hvac_mode, is_(previous))
+            previous = t.hvac_mode
 
     def test_set_is_locked(self):
         t = Thermostat.NestThermostat()
 
         # Test the default value.
-        self.assertFalse(t.is_locked)
+        assert_that(t.is_locked, is_(False))
 
         t.set_is_locked(value=True)
-        self.assertTrue(t.is_locked)
+        assert_that(t.is_locked, is_(True))
 
         t.set_is_locked(value=False)
-        self.assertFalse(t.is_locked)
+        assert_that(t.is_locked, is_(False))
 
     def test_set_locked_temp_max(self):
         t = Thermostat.NestThermostat()
 
         t.set_temperature_scale("F")
         t.set_locked_temp_max(value=90)
-        self.assertAlmostEqual(t.locked_temp_max_f, 90)
+        assert_that(t.locked_temp_max_f, close_to(90, TOLERANCE))
 
         t.set_temperature_scale("C")
         t.set_locked_temp_max(value=30)
-        self.assertAlmostEqual(t.locked_temp_max_c, 30)
+        assert_that(t.locked_temp_max_c, close_to(30, TOLERANCE))
 
         t.set_temperature_scale("K")
         t.set_locked_temp_max(value=290)
-        self.assertAlmostEqual(t._locked_temp_max, 290)
+        assert_that(t._locked_temp_max, close_to(290, TOLERANCE))
 
     def test_set_locked_temp_min(self):
         t = Thermostat.NestThermostat()
 
         t.set_temperature_scale("F")
         t.set_locked_temp_min(value=60)
-        self.assertAlmostEqual(t.locked_temp_min_f, 60)
+        assert_that(t.locked_temp_min_f, close_to(60, TOLERANCE))
 
         t.set_temperature_scale("C")
         t.set_locked_temp_min(value=10)
-        self.assertAlmostEqual(t.locked_temp_min_c, 10)
+        assert_that(t.locked_temp_min_c, close_to(10, TOLERANCE))
 
         t.set_temperature_scale("K")
         t.set_locked_temp_min(value=260)
-        self.assertAlmostEqual(t._locked_temp_min, 260)
+        assert_that(t._locked_temp_min, close_to(260, TOLERANCE))
 
     def test_set_target_temperature_high(self):
         t = Thermostat.NestThermostat()
 
         t.set_temperature_scale("F")
         t.set_target_temperature_high(value=90)
-        self.assertAlmostEqual(t.target_temperature_high_f, 90)
+        assert_that(t.target_temperature_high_f, close_to(90, TOLERANCE))
 
         t.set_temperature_scale("C")
         t.set_target_temperature_high(value=30)
-        self.assertAlmostEqual(t.target_temperature_high_c, 30)
+        assert_that(t.target_temperature_high_c, close_to(30, TOLERANCE))
 
         t.set_temperature_scale("K")
         t.set_target_temperature_high(value=290)
-        self.assertAlmostEqual(t._target_temperature_high, 290)
+        assert_that(t._target_temperature_high, close_to(290, TOLERANCE))
 
     def test_set_target_temperature_low(self):
         t = Thermostat.NestThermostat()
 
         t.set_temperature_scale("F")
         t.set_target_temperature_low(value=60)
-        self.assertAlmostEqual(t.target_temperature_low_f, 60)
+        assert_that(t.target_temperature_low_f, close_to(60, TOLERANCE))
 
         t.set_temperature_scale("C")
         t.set_target_temperature_low(value=10)
-        self.assertAlmostEqual(t.target_temperature_low_c, 10)
+        assert_that(t.target_temperature_low_c, close_to(10, TOLERANCE))
 
         t.set_temperature_scale("K")
         t.set_target_temperature_low(value=260)
-        self.assertAlmostEqual(t._target_temperature_low, 260)
+        assert_that(t._target_temperature_low, close_to(260, TOLERANCE))
 
     def test_set_label(self):
         t = Thermostat.NestThermostat()
 
         t.set_label("Test")
-        self.assertTrue("Test" in t.name_long)
+        assert_that(t.name_long, contains_string("Test"))
 
         t.set_label("New")
-        self.assertTrue("New" in t.name_long)
+        assert_that(t.name_long, contains_string("New"))
 
     def test_fahrenheit_to_celsius(self):
         value = Thermostat.fahrenheit_to_celsius(32)
-        self.assertAlmostEqual(value, 0)
+        assert_that(value, close_to(0, TOLERANCE))
         value = Thermostat.fahrenheit_to_celsius(212)
-        self.assertAlmostEqual(value, 100)
+        assert_that(value, close_to(100, TOLERANCE))
 
     def test_celsius_to_fahrenheit(self):
         value = Thermostat.celsius_to_fahrenheit(0)
-        self.assertAlmostEqual(value, 32)
+        assert_that(value, close_to(32, TOLERANCE))
         value = Thermostat.celsius_to_fahrenheit(100)
-        self.assertAlmostEqual(value, 212)
+        assert_that(value, close_to(212, TOLERANCE))
 
     def test_celsius_to_kelvin(self):
         value = Thermostat.celsius_to_kelvin(0)
-        self.assertAlmostEqual(value, 273.15)
+        assert_that(value, close_to(273.15, TOLERANCE))
         value = Thermostat.celsius_to_kelvin(100)
-        self.assertAlmostEqual(value, 373.15)
+        assert_that(value, close_to(373.15, TOLERANCE))
 
     def test_kelvin_to_celsius(self):
         value = Thermostat.kelvin_to_celsius(273.15)
-        self.assertAlmostEqual(value, 0)
+        assert_that(value, close_to(0, TOLERANCE))
         value = Thermostat.kelvin_to_celsius(373.15)
-        self.assertAlmostEqual(value, 100)
+        assert_that(value, close_to(100, TOLERANCE))
 
 
 if __name__ == "__main__":
