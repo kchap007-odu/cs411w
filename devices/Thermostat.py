@@ -1,7 +1,7 @@
 import datetime
 import locale
 
-import Devices
+from devices import Devices
 
 
 TEMPERATURE_SCALES = ["K", "C", "F"]

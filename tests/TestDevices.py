@@ -1,6 +1,6 @@
 import unittest
 
-import Devices
+from devices import Devices
 
 
 class TestDevices(unittest.TestCase):
