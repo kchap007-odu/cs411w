@@ -1,10 +1,10 @@
 from typing import List
 
-import Devices
+from devices import Devices
 
 
 class PhilipsHueLamp(Devices.SmartDevice):
-    _rgb_color: List[int, int, int] = [255, 255, 255]
+    _rgb_color: List[int] = [255, 255, 255]
     _brightness: float = 1.0
 
     def __init__(self):

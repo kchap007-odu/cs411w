@@ -3,12 +3,13 @@ import logging
 
 from typing import List, Union
 
-from devices import Thermostat
-import Devices
-import Light
+from devices import Devices, Light, Refrigerator, Thermostat
 
 SUPPORTED_DEVICES = Union[
-    Devices.SmartDevice, Thermostat.NestThermostat, Light.PhilipsHueLamp
+    Devices.SmartDevice,
+    Light.PhilipsHueLamp,
+    Refrigerator.Refrigerator,
+    Thermostat.NestThermostat
 ]
 
 LOGGER = logging.getLogger(__name__)
