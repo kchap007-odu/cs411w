@@ -24,7 +24,7 @@ class TestDevices(unittest.TestCase):
         assert_that(d.name, is_(equal_to(name)))
         assert_that(d.location, is_(equal_to(location)))
         assert_that(d.name_long, string_contains_in_order(
-            device_id, name, location))
+            name, location))
 
     def test_set_status(self):
         d = Devices.SmartDevice()
