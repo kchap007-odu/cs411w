@@ -5,3 +5,4 @@ __pycache__/
 *.log
 python-3.9.6-docs-html/
 *.pyc
+.vscode/
