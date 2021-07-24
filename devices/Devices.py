@@ -91,13 +91,13 @@ class SmartDevice:
         """
         return self._device_type
 
-    def set_device_type(self, type: str = "none"):
+    def set_device_type(self, type_: str = "none"):
         """Setter for device type.
 
         Parameters:
         type (str): The type of the device.
         """
-        self._device_type = type
+        self._device_type = type_
 
     @property
     def location(self) -> str:
