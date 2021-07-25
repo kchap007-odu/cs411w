@@ -33,6 +33,13 @@ class TestSmartHome(unittest.TestCase):
 
         # TODO: Add more tests.
 
+    def test_get_devices_by_type(self):
+        config_file = os.path.join(
+            os.path.dirname(__file__), 'two-thermostats.ini')
+        sh = SmartHome(config_name=config_file)
+        devices = sh.get_devices_by_type("Thermostat")
+        assert_that(len(devices), is_(equal_to(2)))
+
     def test_write_config(self):
         sh = SmartHome()
         t1 = NestThermostat(name="Nest", location="Hallway")
