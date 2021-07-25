@@ -149,7 +149,7 @@ class SmartDevice:
         Returns:
         str: The software version.
         """
-        return datetime.strftime(self._software_version)
+        return datetime.strftime(self._software_version, "%Y.%M.%d")
 
     @property
     def status(self) -> str:
