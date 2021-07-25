@@ -22,21 +22,21 @@ class TestRefrigerator(unittest.TestCase):
         self.assertTrue(True, self.energy_use in range(100, 400))
         self.assertFalse(False, self.energy_use not in range(100, 400))
 
-    def test2(self):
-        self.assertTrue(True, self.target_fridge in range(35, 40))
-        self.assertFalse(False, self.target_fridge not in range(35, 40))
-
-    def test3(self):
-        self.assertTrue(True, self.current_fridge in range(30, 35))
-        self.assertFalse(False, self.current_fridge not in range(30, 35))
-
-    def test4(self):
-        self.assertTrue(True, self.current_freezer in range(5, 10))
-        self.assertFalse(False, self.current_freezer not in range(5, 10))
-
-    def test5(self):
-        self.assertTrue(True, self.target_freezer in range(0, 4))
-        self.assertFalse(False, self.target_freezer not in range(0, 4))
+    # def test2(self):
+    #     self.assertTrue(True, self.target_fridge in range(35, 40))
+    #     self.assertFalse(False, self.target_fridge not in range(35, 40))
+    #
+    # def test3(self):
+    #     self.assertTrue(True, self.current_fridge in range(30, 35))
+    #     self.assertFalse(False, self.current_fridge not in range(30, 35))
+    #
+    # def test4(self):
+    #     self.assertTrue(True, self.current_freezer in range(5, 10))
+    #     self.assertFalse(False, self.current_freezer not in range(5, 10))
+    #
+    # def test5(self):
+    #     self.assertTrue(True, self.target_freezer in range(0, 4))
+    #     self.assertFalse(False, self.target_freezer not in range(0, 4))
 
     def test6(self):
         self.assertTrue(True, self.model_number in range(1000, 9999))
