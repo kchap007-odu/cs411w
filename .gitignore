@@ -6,3 +6,4 @@ __pycache__/
 python-3.9.6-docs-html/
 *.pyc
 .vscode/
+tests/*.json
