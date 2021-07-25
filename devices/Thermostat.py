@@ -1,6 +1,7 @@
 import locale
 
 from datetime import datetime, timedelta
+from typing import List
 
 from devices import Devices
 
@@ -10,6 +11,17 @@ HVAC_MODES = ["heat", "cool", "heat-cool", "eco", "off"]
 TIMES_TO_TARGET = ["~0", "<5", "~15", "~90", "120"]
 TRAINING = ["training", "ready"]
 DEGREES_PER_MINUTE = 1
+API_RETURN_PARAMETERS = [
+    "device_id",
+    "name",
+    "status",
+    "humidity",
+    "ambient_temperature",
+    "target_temperature",
+    "temperature_scale",
+    "hvac_mode",
+    "fan_timer_timeout"
+]
 
 
 class NestThermostat(Devices.SmartDevice):
@@ -51,7 +63,72 @@ class NestThermostat(Devices.SmartDevice):
             f"Device {self._device_id} is now a {self._device_type}."
         )
 
-    @property
+    def _as_dict(self) -> dict:
+        """Representation of the object state as a dictionary.
+
+        Returns:
+            dict: The state of the device to report in JSON messages.
+        """
+        self._logger.debug(
+            f"Get device {self._device_id} as dictionary."
+        )
+        return self._dict_from_list(API_RETURN_PARAMETERS)
+
+    def _dict_from_list(self, parameters: List):
+        """Returns a dictionary of device properties from a list of
+        parameter names. Intended to be used with API queries and
+        internal state logging.
+
+        Args:
+            parameters (List): A list of the property names to return.
+        """
+
+        dictionary = {}
+        # Comprehensions doesn't work as expected with eval and self
+        for parameter in parameters:
+            dictionary.update({parameter: eval(f"self.{parameter}")})
+
+        return dictionary
+
+    def _from_json(self, dictionary: dict):
+        """Set device parameters from dictionary. To be used with API
+        POST requests and configuration files.
+
+        Args:
+            dictionary (dict): The state to set the device to.
+        """
+        # Look for units first.
+        if "temperature_units" in dictionary.keys():
+            eval(f"self.set_{dictionary['temperature_units']}")
+            # del eval(f"dictionary['temperature_units']")
+
+        properties = dir(self)
+        for key in dictionary.keys():
+            parameter = f"set_{key}"
+            if parameter in properties:
+                eval(f"self.{parameter}(dictionary['{key}'])")
+            else:
+                self._logger.warning(
+                    f"No parameter matching '{parameter}' in object. Skipping")
+
+    def _get_settable_parameters(self) -> dict:
+        """Getter for settable parameters. Intended to be used to log
+        the state of the simulated device to store in a configuration
+        file.
+
+        Returns:
+            dict: The internal state of the device.
+        """
+        # TODO: Not sure this is the best way to handle storing the
+        # current device state.
+        parameters = [
+            d for d in dir(self) if (d[0] != "_") and (d.count("set") == 0)
+            and (d.count("_c") == 0) and (d.count("_f") == 0)
+        ]
+
+        return self._dict_from_list(parameters)
+
+    @ property
     def ambient_temperature(self) -> int:
         """Getter method for ambient temperature.
 
@@ -71,84 +148,33 @@ class NestThermostat(Devices.SmartDevice):
         else:
             return self._ambient_temperature
 
-    @property
+    @ property
     def ambient_temperature_c(self) -> float:
         """Getter for ambient temperature.
 
         Returns:
-            float: The ambient temperature, as measured at the device, in
-            Celsius.
+            float: The ambient temperature, as measured at the device,
+            in Celsius.
         """
         self._logger.debug(
             f"Get ambient temperature (C) for device {self._device_id}."
         )
         return kelvin_to_celsius(self._ambient_temperature)
 
-    @property
+    @ property
     def ambient_temperature_f(self) -> float:
         """Getter for ambient temperature in Fahrenheit.
 
         Returns:
-            float: The ambient temperature, as measured at the device, in
-            Celsius.
+            float: The ambient temperature, as measured at the device,
+            in Celsius.
         """
         self._logger.debug(
             f"Get ambient temperature (F) for device {self._device_id}."
         )
         return celsius_to_fahrenheit(self.ambient_temperature_c)
 
-    def as_dict(self) -> dict:
-        """Representation of the object state as a dictionary.
-
-        Returns:
-            dict: The internal state of the device.
-        """
-        self._logger.debug(
-            f"Get device {self._device_id} as dictionary."
-        )
-        return {
-            "device_id": self.device_id,
-            "name": self.name_long,
-            "status": self.status,
-            "humidity": self.humidity,
-            "ambient_temperature": self.ambient_temperature,
-            "target_temperature": self.target_temperature,
-            "temperature_scale": self.temperature_scale,
-            "hvac_mode": self.hvac_mode,
-            "fan_timer_timeout":
-                self.fan_timer_timeout.strftime("%Y/%m/%d %H:%M:%S")
-        }
-
-    def get_settable_parameters(self) -> dict:
-        """Getter for settable parameters. Intended to be used to log
-        the state of the simulated device to store in a configuration
-        file.
-
-        Returns:
-            dict: The internal state of the device.
-        """
-        return {
-            "device_type": self.device_type,
-            "hvac_mode": self.hvac_mode,
-            "previous_hvac_mode": self.previous_hvac_mode,
-            "target_temperature_high": self.target_temperature_high,
-            "target_temperatue_low": self.target_temperature_low,
-            "locked_temp_max": self.locked_temp_max,
-            "locked_temp_min": self.locked_temp_min,
-            "eco_temperature_high": self.eco_temperature_high,
-            "eco_temperature_low": self.eco_temperature_low,
-            "temperature_scale": self.temperature_scale,
-            "has_fan": self.has_fan,
-            "is_locked": self.is_locked,
-            "fan_timer_duration": int(self.fan_timer_duration.seconds / 60),
-            "name": self.name,
-            "location": self.location,
-            "device_id": self.device_id,
-            "sunlight_correction_enabled": self.sunlight_correction_enabled,
-            "sunlight_correction_active": self.sunlight_correction_active
-        }
-
-    @property
+    @ property
     def can_heat(self) -> bool:
         """Boolean indicating whether the system controlled by the
         thermostat is capable of heating. For simulation purposes
@@ -162,7 +188,7 @@ class NestThermostat(Devices.SmartDevice):
         )
         return True
 
-    @property
+    @ property
     def can_cool(self) -> bool:
         """Boolean indicating whether the system controlled by the
         thermostat is capable of cooling. For simulation purposes
@@ -176,7 +202,7 @@ class NestThermostat(Devices.SmartDevice):
         )
         return True
 
-    @property
+    @ property
     def eco_temperature_high_f(self) -> float:
         """Getter for the target high temperature, in Fahrenheit.
 
@@ -188,7 +214,7 @@ class NestThermostat(Devices.SmartDevice):
         )
         return celsius_to_fahrenheit(self.eco_temperature_high_c)
 
-    @property
+    @ property
     def eco_temperature_high_c(self) -> float:
         """Getter for the target high eco temperature, in Celsius.
 
@@ -200,7 +226,7 @@ class NestThermostat(Devices.SmartDevice):
         )
         return kelvin_to_celsius(self._eco_temperature_high)
 
-    @property
+    @ property
     def eco_temperature_high(self) -> int:
         """Getter for eco temperature.
 
@@ -232,7 +258,7 @@ class NestThermostat(Devices.SmartDevice):
         else:
             self._eco_temperature_high = value
 
-    @property
+    @ property
     def eco_temperature_low_f(self) -> float:
         """Getter for the target low eco temperature, in Fahrenheit.
 
@@ -244,7 +270,7 @@ class NestThermostat(Devices.SmartDevice):
         )
         return celsius_to_fahrenheit(self.eco_temperature_low_c)
 
-    @property
+    @ property
     def eco_temperature_low_c(self) -> float:
         """Getter for the target low eco temperature, in Celsius.
 
@@ -256,7 +282,7 @@ class NestThermostat(Devices.SmartDevice):
         )
         return kelvin_to_celsius(self._eco_temperature_low)
 
-    @property
+    @ property
     def eco_temperature_low(self) -> int:
         """Getter for the target low eco temperature.
 
@@ -288,7 +314,7 @@ class NestThermostat(Devices.SmartDevice):
         else:
             self._eco_temperature_low = value
 
-    @property
+    @ property
     def fan_timer_active(self) -> bool:
         """Boolean indicating whether the fan timer is active.
 
@@ -300,7 +326,7 @@ class NestThermostat(Devices.SmartDevice):
         )
         return self.fan_timer_timeout > datetime.now()
 
-    @property
+    @ property
     def fan_timer_timeout(self) -> datetime:
         """The time at which the fan timer will reach zero.
 
@@ -313,7 +339,7 @@ class NestThermostat(Devices.SmartDevice):
         )
         return datetime.now() + self.fan_timer_duration
 
-    @property
+    @ property
     def fan_timer_duration(self) -> timedelta:
         """Getter for fan timer duration.
 

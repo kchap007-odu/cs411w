@@ -1,0 +1,9 @@
+{
+    "temperature_scale": "F",
+    "eco_temperature_high": 50,
+    "hvac_mode": "cool",
+    "has_leaf": true,
+    "is_locked": true,
+    "name": "Nest",
+    "location": "Upstairs"
+}

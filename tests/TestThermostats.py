@@ -1,5 +1,7 @@
 import unittest
 import datetime
+import json
+import os
 
 from hamcrest import assert_that, close_to, contains_string, equal_to, is_,\
     is_not, string_contains_in_order
@@ -168,6 +170,33 @@ class TestThermostats(unittest.TestCase):
         t.set_temperature_scale("K")
         t.set_target_temperature_low(value=260)
         assert_that(t._target_temperature_low, close_to(260, TOLERANCE))
+
+    def test_set_from_json(self):
+        t = Thermostat.NestThermostat()
+        for scale in Thermostat.TEMPERATURE_SCALES:
+            params = {"temperature_scale": scale}
+            t._from_json(params)
+            assert_that(t.temperature_scale, is_(equal_to(scale)))
+
+        for hvac_mode in Thermostat.HVAC_MODES:
+            params = {"hvac_mode": hvac_mode}
+            t._from_json(params)
+            assert_that(t.hvac_mode, is_(equal_to(hvac_mode)))
+
+        file = os.path.join(
+            os.path.dirname(__file__), "thermostat-properties.json")
+
+        # TODO: Add test for reading JSON from file.
+        fid = open(file)
+        dictionary = json.loads(fid.read())
+        fid.close()
+
+        t._from_json(dictionary)
+        assert_that(t.temperature_scale, is_(equal_to("F")))
+        assert_that(t.eco_temperature_high, is_(equal_to(50)))
+        assert_that(t.hvac_mode, is_(equal_to("cool")))
+        assert_that(t.name, is_(equal_to("Nest")))
+        assert_that(t.location, is_(equal_to("Upstairs")))
 
     def test_set_label(self):
         t = Thermostat.NestThermostat()
