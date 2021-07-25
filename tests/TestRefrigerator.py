@@ -6,8 +6,14 @@ class TestRefrigerator(unittest.TestCase):
     def setUp(self):
         energy_use = randrange(100, 400)
         self.energy_use = energy_use
-        temp_range = randrange(35, 40)
-        self.temp_range = temp_range
+        target_fridge = randrange(35, 40)
+        self.temp_range = target_fridge
+        current_fridge = randrange(30, 35)
+        self.temp_range = current_fridge
+        current_freezer = randrange(5, 10)
+        self.temp_range = current_freezer
+        target_freezer = randrange(0, 4)
+        self.temp_range = target_freezer
         model_number = randrange(1000, 9999)
         self.model_number = model_number
         pass
@@ -17,8 +23,8 @@ class TestRefrigerator(unittest.TestCase):
         self.assertFalse(False, self.energy_use not in range(100, 400))
 
     def test2(self):
-        self.assertTrue(True, self.temp_range in range(35, 40))
-        self.assertFalse(False, self.temp_range not in range(35, 40))
+        self.assertTrue(True, self.target_fridge in range(35, 40))
+        self.assertFalse(False, self.target_fridge not in range(35, 40))
 
     def test3(self):
         self.assertTrue(True, self.model_number in range(1000, 9999))
