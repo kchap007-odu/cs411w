@@ -4,23 +4,38 @@ from devices import Devices
 
 
 class PhilipsHueLamp(Devices.SmartDevice):
-    _rgb_color: List[int] = [255, 255, 255]
-    _brightness: float = 1.0
+
+    _device_type = "Light"
 
     def __init__(self):
         super().__init__()
-        pass
+
+        self.set_rgb_color([255, 255, 255])
+        self.set_brightness(1.0)
 
     @property
     def brightness(self) -> float:
         return self._brightness
 
     def set_brightness(self, brightness: float = 0.5):
-        if 0.0 < brightness < 1.0:
+        if 0.0 <= brightness <= 1.0:
             self._brightness = brightness
+
+    @property
+    def rgb_color(self) -> List[int]:
+        return self._rgb_color
 
     def set_rgb_color(self, color: List[int] = [255, 255, 255]):
         pass
+
+    def as_dict(self):
+        return {
+            "device_type": self.device_type,
+            "device_id": self.device_id,
+            "name": self.name,
+            "brightness": self.brightness
+            # "rgb_color": self.rgb_color
+        }
 
 
 class State:
