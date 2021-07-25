@@ -118,7 +118,7 @@ class SmartHome():
         Returns:
             List: A list of all devices with a matching type
         """
-        return [i for i in self.devices if i.device_type == type]
+        return [i for i in self.devices if i.device_type == type_]
 
     def write_config_file(self):
         """Stores the current smart home's device list and states as a
@@ -143,7 +143,7 @@ def create_class_from_name(name: str = "") -> SUPPORTED_DEVICES:
     if name == "NestThermostat":
         return Thermostat.NestThermostat()
     elif name == "PhillipsHueLamp":
-        return Light.PhilipsHueLamp
+        return Light.PhilipsHueLamp()
     elif name == "SmartDevice":
         return Devices.SmartDevice()
 
