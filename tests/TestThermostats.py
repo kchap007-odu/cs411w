@@ -183,8 +183,30 @@ class TestThermostats(unittest.TestCase):
             t._from_json(params)
             assert_that(t.hvac_mode, is_(equal_to(hvac_mode)))
 
+        parameters = {
+            "temperature_scale": "F",
+            "eco_temperature_high": 75,
+            "eco_temperature_low": 70,
+            "target_temperature_high": 75,
+            "target_temperature_low": 70,
+            "hvac_mode": "cool",
+            "has_leaf": True,
+            "is_locked": True,
+            "name": "Nest",
+            "location": "Upstairs",
+            "device_id": "1234",
+            "previous_hvac_mode": "off",
+            "locked_temp_max": 75,
+            "locked_temp_min": 71,
+            "sunlight_correction_active": True,
+            "sunlight_correction_enabled": True
+        }
         file = os.path.join(
             os.path.dirname(__file__), "thermostat-properties.json")
+
+        fid = open(file, "w")
+        fid.write(json.dumps(parameters, indent=4))
+        fid.close()
 
         # TODO: Add test for reading JSON from file.
         fid = open(file)
@@ -193,10 +215,19 @@ class TestThermostats(unittest.TestCase):
 
         t._from_json(dictionary)
         assert_that(t.temperature_scale, is_(equal_to("F")))
-        assert_that(t.eco_temperature_high, is_(equal_to(50)))
+        assert_that(t.eco_temperature_high, is_(close_to(75, TOLERANCE)))
+        assert_that(t.eco_temperature_low, is_(close_to(70, TOLERANCE)))
+        assert_that(t.target_temperature_high, is_(close_to(75, TOLERANCE)))
+        assert_that(t.target_temperature_low, is_(close_to(70, TOLERANCE)))
         assert_that(t.hvac_mode, is_(equal_to("cool")))
         assert_that(t.name, is_(equal_to("Nest")))
         assert_that(t.location, is_(equal_to("Upstairs")))
+        assert_that(t.device_id, is_(equal_to("1234")))
+        assert_that(t.previous_hvac_mode, is_(equal_to("off")))
+        assert_that(t.locked_temp_max, is_(close_to(75, TOLERANCE)))
+        assert_that(t.locked_temp_min, is_(close_to(71, TOLERANCE)))
+        assert_that(t.sunlight_correction_active, is_(True))
+        assert_that(t.sunlight_correction_enabled, is_(True))
 
     def test_set_label(self):
         t = Thermostat.NestThermostat()

@@ -1,9 +1,18 @@
 {
     "temperature_scale": "F",
-    "eco_temperature_high": 50,
+    "eco_temperature_high": 75,
+    "eco_temperature_low": 70,
+    "target_temperature_high": 75,
+    "target_temperature_low": 70,
     "hvac_mode": "cool",
     "has_leaf": true,
     "is_locked": true,
     "name": "Nest",
-    "location": "Upstairs"
+    "location": "Upstairs",
+    "device_id": "1234",
+    "previous_hvac_mode": "off",
+    "locked_temp_max": 75,
+    "locked_temp_min": 71,
+    "sunlight_correction_active": true,
+    "sunlight_correction_enabled": true
 }
