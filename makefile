@@ -12,6 +12,7 @@ test:
 	python TestThermostats.py
 
 clean:
+	rm *.log
 	rm -r __pycache__
 	rm -r */__pycache__
-	rm -r **/__pycache__
+	rm -r */*/__pycache__
