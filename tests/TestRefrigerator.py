@@ -1,29 +1,31 @@
 import unittest
-from random import randrange
+from devices.Refrigerator import Refrigerator
 
 
 class TestRefrigerator(unittest.TestCase):
+
+    # setup method
     def setUp(self):
-        energy_use = randrange(100, 400)
-        self.energy_use = energy_use
-        temp_range = randrange(35, 40)
-        self.temp_range = temp_range
-        model_number = randrange(1000, 9999)
-        self.model_number = model_number
-        pass
+        self.rf = Refrigerator()
 
-    def test1(self):
-        self.assertTrue(True, self.energy_use in range(100, 400))
-        self.assertFalse(False, self.energy_use not in range(100, 400))
+    # below 5 methods are for individual variables
+    # assertTrue() calls function and check if return value matches condition or not. If matches, asserts true else asserts false
+    def test_current_fridge_temperature(self):
+        self.assertTrue(self.rf.current_fridge_temperature() >= 30 and self.rf.current_fridge_temperature() <= 35)
 
-    def test2(self):
-        self.assertTrue(True, self.temp_range in range(35, 40))
-        self.assertFalse(False, self.temp_range not in range(35, 40))
+    def test_target_fridge_temperature(self):
+        self.assertTrue(self.rf.target_fridge_temperature() >= 35 and self.rf.target_fridge_temperature() <= 40)
 
-    def test3(self):
-        self.assertTrue(True, self.model_number in range(1000, 9999))
-        self.assertFalse(False, self.model_number not in range(1000, 9999))
+    def test_current_freezer_temperature(self):
+        self.assertTrue(self.rf.current_freezer_temperature() >= 5 and self.rf.current_freezer_temperature() <= 10)
+
+    def test_target_freezer_temperature(self):
+        self.assertTrue(self.rf.target_freezer_temperature() >= 0 and self.rf.target_freezer_temperature() <= 4)
+
+    def test_energy_use(self):
+        self.assertTrue(self.rf.energy_use() >= 100 and self.rf.energy_use() <= 400)
 
 
+# main to call unittest
 if __name__ == "__main__":
     unittest.main()

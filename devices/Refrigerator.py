@@ -2,14 +2,6 @@ from random import randrange
 
 
 class Refrigerator:
-    # def __init__(self, current_fridge_temperature, target_fridge_temperature, current_freezer_temperature,
-    #              target_freezer_temperature, energy_use):
-    #     self.current_fridge_temperature = current_fridge_temperature
-    #     self.target_fridge_temperature = target_fridge_temperature
-    #     self.current_freezer_temperature = current_freezer_temperature
-    #     self.target_freezer_temperature = target_freezer_temperature
-    #     self.energy_use = energy_use
-
     def current_fridge_temperature(self):
         return randrange(30, 35)
 
