@@ -1,8 +1,15 @@
+import os
 import sys
 
 from flask import Flask
 
-from smarthome.SmartHome import SmartHome
+# FIXME: There's no way this is the right way to handle this.
+try:
+    from smarthome.SmartHome import SmartHome
+except ModuleNotFoundError:
+    sys.path.append(os.path.dirname(__file__) + "/../..")
+    from smarthome.SmartHome import SmartHome
+
 
 app = Flask(__name__)
 sh = SmartHome(config_name="home-1.ini")
