@@ -12,14 +12,16 @@ except ModuleNotFoundError:
 
 
 app = Flask(__name__)
-sh = SmartHome(config_name="home-1.ini")
+config_name = os.path.join(os.path.abspath(
+    os.path.dirname(__file__)), "home-1.ini")
+sh = SmartHome(config_name=config_name)
 
 # --------------------------- AUTHORIZATION -------------------------- #
 
 
 @app.route("/accesstoken", methods=["POST"])
 def get_access_token():
-    pass
+    return "Here's your access token: 1234"
 
 
 @app.route("/authorize", methods=["GET"])
@@ -29,7 +31,7 @@ def get_authorization():
 
 @app.route("/token", methods=["POST"])
 def get_token():
-    pass
+    return "here's your token: O"
 
 # -------------------------- THERMOSTAT ------------------------------ #
 
@@ -55,7 +57,7 @@ def get_devices_by_type(device_type):
 def do_subpath(device_type, device_id):
     device = sh.get_device_by_device_id(device_id)
     print(device)
-    return device.as_dict()
+    return device._as_dict()
 
 
 @app.route("/locations", methods=["GET"])
