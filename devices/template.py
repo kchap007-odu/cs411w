@@ -52,6 +52,12 @@ class NewDevice(SmartDevice):
     """
     Type hints for return values take the form of:
     def <function>(<args>) -> <return_type>:
+    The @property decorator tells the Python interpreter that this
+    member function should be treated as a property and not a function,
+    i.e., can be called as:
+    self.new_property_a
+    rather than:
+    self.new_property_a()
     """
     @property
     def new_property_a(self) -> int:
