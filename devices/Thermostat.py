@@ -6,22 +6,11 @@ from typing import List
 from devices import Devices
 
 
-TEMPERATURE_SCALES = ["K", "C", "F"]
-HVAC_MODES = ["heat", "cool", "heat-cool", "eco", "off"]
-TIMES_TO_TARGET = ["~0", "<5", "~15", "~90", "120"]
-TRAINING = ["training", "ready"]
-DEGREES_PER_MINUTE = 1
-API_RETURN_PARAMETERS = [
-    "device_id",
-    "name",
-    "status",
-    "humidity",
-    "ambient_temperature",
-    "target_temperature",
-    "temperature_scale",
-    "hvac_mode",
-    "fan_timer_timeout"
-]
+# TEMPERATURE_SCALES = ["K", "C", "F"]
+# HVAC_MODES = ["heat", "cool", "heat-cool", "eco", "off"]
+# TIMES_TO_TARGET = ["~0", "<5", "~15", "~90", "120"]
+# TRAINING = ["training", "ready"]
+# DEGREES_PER_MINUTE = 1
 
 
 class NestThermostat(Devices.SmartDevice):
@@ -29,7 +18,23 @@ class NestThermostat(Devices.SmartDevice):
 
     https://developers.nest.com/reference/api-thermostat
     """
-    _device_type = "Thermostat"
+    _device_type: str = "Thermostat"
+    _temperature_scales: List = ["K", "C", "F"]
+    _hvac_modes: List[str] = ["heat", "cool", "heat-cool", "eco", "off"]
+    _time_to_target_options: List[str] = ["~0", "<5", "~15", "~90", "120"]
+    _training_modes: List[str] = ["training", "ready"]
+    _degrees_per_minute: int = 1  # Currently unused.
+    _api_return_parameters: List = [
+        "device_id",
+        "name",
+        "status",
+        "humidity",
+        "ambient_temperature",
+        "target_temperature",
+        "temperature_scale",
+        "hvac_mode",
+        "fan_timer_timeout"
+    ]
 
     def __init__(self, location: str = "none", name: str = "none"):
         super().__init__(name=name, location=location)
@@ -63,55 +68,7 @@ class NestThermostat(Devices.SmartDevice):
             f"Device {self._device_id} is now a {self._device_type}."
         )
 
-    def _as_dict(self) -> dict:
-        """Representation of the object state as a dictionary.
-
-        Returns:
-            dict: The state of the device to report in JSON messages.
-        """
-        self._logger.debug(
-            f"Get device {self._device_id} as dictionary."
-        )
-        return self._dict_from_list(API_RETURN_PARAMETERS)
-
-    def _dict_from_list(self, parameters: List):
-        """Returns a dictionary of device properties from a list of
-        parameter names. Intended to be used with API queries and
-        internal state logging.
-
-        Args:
-            parameters (List): A list of the property names to return.
-        """
-
-        dictionary = {}
-        # Comprehensions doesn't work as expected with eval and self
-        for parameter in parameters:
-            dictionary.update({parameter: eval(f"self.{parameter}")})
-
-        return dictionary
-
-    def _from_json(self, dictionary: dict):
-        """Set device parameters from dictionary. To be used with API
-        POST requests and configuration files.
-
-        Args:
-            dictionary (dict): The state to set the device to.
-        """
-        # Look for units first.
-        if "temperature_units" in dictionary.keys():
-            eval(f"self.set_{dictionary['temperature_units']}")
-            # del eval(f"dictionary['temperature_units']")
-
-        properties = dir(self)
-        for key in dictionary.keys():
-            parameter = f"set_{key}"
-            if parameter in properties:
-                eval(f"self.{parameter}(dictionary['{key}'])")
-            else:
-                self._logger.warning(
-                    f"No parameter matching '{parameter}' in object. Skipping")
-
-    def _get_settable_parameters(self) -> dict:
+    def __properties__(self):
         """Getter for settable parameters. Intended to be used to log
         the state of the simulated device to store in a configuration
         file.
@@ -119,14 +76,27 @@ class NestThermostat(Devices.SmartDevice):
         Returns:
             dict: The internal state of the device.
         """
-        # TODO: Not sure this is the best way to handle storing the
-        # current device state.
         parameters = [
             d for d in dir(self) if (d[0] != "_") and (d.count("set") == 0)
             and (d.count("_c") == 0) and (d.count("_f") == 0)
         ]
 
-        return self._dict_from_list(parameters)
+        return self.__as_json__(parameters)
+
+    def __from_json__(self, properties: dict):
+        """Set device parameters from dictionary. To be used with API
+        POST requests and configuration files.
+
+        Args:
+            dictionary (dict): The state to set the device to.
+        """
+        # Look for units first so the temperatures are set correctly.
+        value = properties.pop("temperature_scale", None)
+        if value is not None:
+            eval(f"self.set_temperature_scale('{value}')")
+
+        # Let superclass handle the rest
+        super().__from_json__(properties)
 
     @ property
     def ambient_temperature(self) -> int:
@@ -289,7 +259,7 @@ class NestThermostat(Devices.SmartDevice):
         Returns:
             int: The eco low temperature, in current units.
         """
-        # TODO: Force this to return an int.
+        # TODO: Force this to return an int or float rounded to 0.5.
         if self.temperature_scale == "C":
             return self.eco_temperature_low_c
         elif self.temperature_scale == "F":
@@ -426,7 +396,7 @@ class NestThermostat(Devices.SmartDevice):
             value (str, optional): The value to set HVAC mode to. Must
             be "cool", "heat", "heat-cool", or "off". Defaults to "off".
         """
-        if value in HVAC_MODES:
+        if value in self._hvac_modes:
             self.set_previous_hvac_mode(self._hvac_mode)
             self._logger.info(
                 f"Set HVAC mode of device {self._device_id} to {value}."
@@ -665,7 +635,7 @@ class NestThermostat(Devices.SmartDevice):
             value(str): The value to set previous hvac mode to.
         """
 
-        if value in HVAC_MODES:
+        if value in self._hvac_modes:
             self._logger.info(
                 "Set previous HVAC mode of device "
                 + f"{self._device_id} to {value}."
@@ -896,7 +866,7 @@ class NestThermostat(Devices.SmartDevice):
             scale (str, optional): The target units. Must be "K", "C",
             or "F". Defaults to "K".
         """
-        if scale in TEMPERATURE_SCALES:
+        if scale in self._temperature_scales:
             self._logger.info(
                 f"Set value of scale for device {self._device_id} to {scale}."
             )
@@ -914,7 +884,7 @@ class NestThermostat(Devices.SmartDevice):
         self._logger.debug(
             f"Get value of time to target for device {self._device_id}."
         )
-        return TIMES_TO_TARGET[0]
+        return self._time_to_target_options[0]
 
     @ property
     def time_to_target_training(self) -> str:
@@ -928,7 +898,7 @@ class NestThermostat(Devices.SmartDevice):
             "Get value of time to target training "
             + "for device {self._device_id}."
         )
-        return TRAINING[0]
+        return self._training_modes[0]
 
 
 def kelvin_to_celsius(value: float = 0) -> float:

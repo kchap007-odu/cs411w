@@ -37,7 +37,7 @@ class TestThermostats(unittest.TestCase):
     def test_set_temperature_scale(self):
         t = Thermostat.NestThermostat()
 
-        scales = Thermostat.TEMPERATURE_SCALES
+        scales = Thermostat.NestThermostat._temperature_scales
 
         for scale in scales:
             t.set_temperature_scale(scale)
@@ -92,8 +92,7 @@ class TestThermostats(unittest.TestCase):
 
         previous = t.hvac_mode
 
-        modes = Thermostat.HVAC_MODES
-        for mode in modes:
+        for mode in Thermostat.NestThermostat._hvac_modes:
             t.set_hvac_mode(value=mode)
             assert_that(t.hvac_mode, is_(mode))
             assert_that(t.previous_hvac_mode, is_(previous))
@@ -173,16 +172,17 @@ class TestThermostats(unittest.TestCase):
 
     def test_set_from_json(self):
         t = Thermostat.NestThermostat()
-        for scale in Thermostat.TEMPERATURE_SCALES:
+        for scale in Thermostat.NestThermostat._temperature_scales:
             params = {"temperature_scale": scale}
-            t._from_json(params)
+            t.__from_json__(params)
             assert_that(t.temperature_scale, is_(equal_to(scale)))
 
-        for hvac_mode in Thermostat.HVAC_MODES:
+        for hvac_mode in Thermostat.NestThermostat._hvac_modes:
             params = {"hvac_mode": hvac_mode}
-            t._from_json(params)
+            t.__from_json__(params)
             assert_that(t.hvac_mode, is_(equal_to(hvac_mode)))
 
+        # ------------ Write the file as a part of the test ------------
         parameters = {
             "device_type": "Thermostat",
             "hvac_mode": "cool",
@@ -199,7 +199,7 @@ class TestThermostats(unittest.TestCase):
             "fan_timer_duration": 5,
             "name": "Nest",
             "location": "Upstairs",
-            "device_id": "9dfeaa011f87d9b4e8a1891091db940d",
+            "device_id": "1234",
             "sunlight_correction_active": False,
             "sunlight_correction_enabled": False
         }
@@ -210,27 +210,37 @@ class TestThermostats(unittest.TestCase):
         fid.write(json.dumps(parameters, indent=4))
         fid.close()
 
-        # TODO: Add test for reading JSON from file.
+        # ---------------------- End file write ------------------------
         fid = open(file)
         dictionary = json.loads(fid.read())
         fid.close()
 
-        t._from_json(dictionary)
-        assert_that(t.temperature_scale, is_(equal_to("F")))
-        assert_that(t.eco_temperature_high, is_(close_to(76, TOLERANCE)))
-        assert_that(t.eco_temperature_low, is_(close_to(74, TOLERANCE)))
-        assert_that(t.target_temperature_high, is_(close_to(75, TOLERANCE)))
-        assert_that(t.target_temperature_low, is_(close_to(70, TOLERANCE)))
-        assert_that(t.hvac_mode, is_(equal_to("cool")))
-        assert_that(t.name, is_(equal_to("Nest")))
-        assert_that(t.location, is_(equal_to("Upstairs")))
+        t.__from_json__(dictionary)
+        assert_that(t.temperature_scale, is_(
+            equal_to(parameters["temperature_scale"])))
+        assert_that(t.eco_temperature_high, is_(
+            close_to(parameters["eco_temperature_high"], TOLERANCE)))
+        assert_that(t.eco_temperature_low, is_(
+            close_to(parameters["eco_temperature_low"], TOLERANCE)))
+        assert_that(t.target_temperature_high, is_(
+            close_to(parameters["target_temperature_high"], TOLERANCE)))
+        assert_that(t.target_temperature_low, is_(
+            close_to(parameters["target_temperature_low"], TOLERANCE)))
+        assert_that(t.hvac_mode, is_(equal_to(parameters["hvac_mode"])))
+        assert_that(t.name, is_(equal_to(parameters["name"])))
+        assert_that(t.location, is_(equal_to(parameters["location"])))
         assert_that(t.device_id, is_(
-            equal_to("9dfeaa011f87d9b4e8a1891091db940d")))
-        assert_that(t.previous_hvac_mode, is_(equal_to("off")))
-        assert_that(t.locked_temp_max, is_(close_to(75, TOLERANCE)))
-        assert_that(t.locked_temp_min, is_(close_to(71, TOLERANCE)))
-        assert_that(t.sunlight_correction_active, is_(False))
-        assert_that(t.sunlight_correction_enabled, is_(False))
+            equal_to(parameters["device_id"])))
+        assert_that(t.previous_hvac_mode, is_(
+            equal_to(parameters["previous_hvac_mode"])))
+        assert_that(t.locked_temp_max, is_(
+            close_to(parameters["locked_temp_max"], TOLERANCE)))
+        assert_that(t.locked_temp_min, is_(
+            close_to(parameters["locked_temp_min"], TOLERANCE)))
+        assert_that(t.sunlight_correction_active, is_(
+            parameters["sunlight_correction_active"]))
+        assert_that(t.sunlight_correction_enabled,
+                    is_(parameters["sunlight_correction_enabled"]))
 
     def test_set_label(self):
         t = Thermostat.NestThermostat()
