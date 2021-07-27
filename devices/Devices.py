@@ -113,6 +113,21 @@ class SmartDevice:
                 self._logger.warning(
                     f"No parameter matching '{parameter}' in object. Skipping")
 
+    def __properties__(self):
+        """Getter for settable parameters. Intended to be used to log
+        the state of the simulated device to store in a configuration
+        file.
+
+        Returns:
+            dict: The internal state of the device.
+        """
+        # FIXME: Make this method more extensible. Maybe regexp?
+        parameters = [
+            d for d in dir(self) if (d[0] != "_") and (d.count("set") == 0)
+        ]
+
+        return self.__as_json__(parameters)
+
     @property
     def device_id(self) -> str:
         """Getter for unique device identifier.
