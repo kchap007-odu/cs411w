@@ -1,6 +1,9 @@
 # Import statement for the string module
 import string
 
+# Import statement for the typing module. For extended type annotations.
+from typing import List
+
 # Import statement for the SmartDevice parent class
 from devices.Devices import SmartDevice
 
@@ -16,17 +19,16 @@ class NewDevice(SmartDevice):
     with the method being defined in the parent class.
     Typically, a single underscore represents to other programmers that
     this value is not meant to be set directly.
+
+    Type hints provide hints to programmers as to what data type
+    the input should take. It is specified as:
+    <name>:<type> = <default_value>
     """
-    _api_return_parameters = [
+    _device_type: str = "new_device"
+    _api_return_parameters: List = [
         "new_property_a",
         "new_property_b"
     ]
-
-    """
-        Type hints provide hints to programmers as to what data type
-        the input should take. It is specified as:
-        <name>:<type> = <default_value>
-    """
 
     def __init__(self, key1: str = "value1", key2: str = "value2"):
         """The constructor. Magic methods, or dunder (double-underscore)
