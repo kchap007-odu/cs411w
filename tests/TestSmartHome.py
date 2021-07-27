@@ -13,8 +13,8 @@ class TestSmartHome(unittest.TestCase):
         assert_that(sh.num_devices, is_(equal_to(0)))
 
         config_file = os.path.join(
-            os.path.dirname(__file__), 'two-thermostats.ini')
-        sh = SmartHome(config_name=config_file)
+            os.path.dirname(__file__), 'test-two-thermostats.json')
+        sh = SmartHome(json_file=config_file)
         assert_that(sh.num_devices, is_(equal_to(2)))
 
     def test_add_device(self):
@@ -35,10 +35,17 @@ class TestSmartHome(unittest.TestCase):
 
     def test_get_devices_by_type(self):
         config_file = os.path.join(
-            os.path.dirname(__file__), 'two-thermostats.ini')
+            os.path.dirname(__file__), 'test-smart-home.json')
         sh = SmartHome(config_name=config_file)
         devices = sh.get_devices_by_type("Thermostat")
         assert_that(len(devices), is_(equal_to(2)))
+
+    def test_construct_devices_from_json(self):
+        config_file = os.path.join(
+            os.path.dirname(__file__), 'test-smart-home.json')
+        sh = SmartHome()
+        sh._construct_devices_from_json(filename=config_file)
+        assert_that(sh.num_devices, is_(equal_to(3)))
 
     def test_write_config(self):
         sh = SmartHome()
@@ -46,6 +53,7 @@ class TestSmartHome(unittest.TestCase):
         t2 = NestThermostat(name="Nest", location="Living Room")
         sh.add_new_device(t1)
         sh.add_new_device(t2)
+        sh.write_config_file()
 
         assert_that(sh.num_devices, is_(equal_to(2)))
 

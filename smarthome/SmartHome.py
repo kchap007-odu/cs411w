@@ -1,4 +1,4 @@
-import configparser
+import json
 import logging
 
 from typing import List, Union
@@ -37,40 +37,24 @@ class SmartHome():
         the smart home configuration.
     """
 
-    def __init__(self, config_name: str = ""):
-        self._config_name: str = config_name
+    def __init__(self, json_file: str = None):
+        self._config_name: str = json_file
 
-        config = configparser.ConfigParser()
-        config.read(config_name)
         self.devices: List[SUPPORTED_DEVICES] = []
-        if config.sections():
-            self._construct_devices(config)
-        else:
-            LOGGER.warning("Configuration file is empty")
+        if json_file is not None:
+            self._construct_devices_from_json(json_file)
 
-    def _construct_devices(self, config: configparser.ConfigParser):
-        """Constructs devices from a saved configuration in .ini file.
-        This function assumes all classes have setters for corresponding
-        values following a "set_<name>" format.
-
-        Args:
-            config (configparser.ConfigParser): The configuration file
-            containing smart device information associated with the
-            home.
-        """
-        for section in config.sections():
-            items = dict(config.items(section))
-            # TODO: Enforce requirement for class to be in config.
-            class_ = items["class"]
-            # Remove class since it is not a property of the device.
-            del items["class"]
-            # Create the device from the stored class name.
-            device = create_class_from_name(class_)
-            for item in items.keys():
-                command = f"device.set_{item}({items[item]})"
-                # print(command)
-                eval(command)
-            self.add_new_device(device)
+    def _construct_devices_from_json(self, filename: str = ""):
+        with open(filename) as f:
+            d = json.loads(f.read())
+        # FIXME: Rewrite this using dictionary.pop() method.
+        if "devices" in d.keys():
+            devices = d["devices"]
+        for device in devices.keys():
+            device_class = devices[device]["class"]
+            d = create_class_from_name(device_class)
+            d.__from_json__(devices[device])
+            self.add_new_device(d)
 
     def add_new_device(self, device: SUPPORTED_DEVICES = None):
         """Adds a device to the list of devices in the home.
@@ -124,13 +108,11 @@ class SmartHome():
         """Stores the current smart home's device list and states as a
         configuration file.
         """
+        dictionary = {}
         for i, device in enumerate(self.devices, start=1):
-            print(f"[device{i}]")
-            params = device.get_settable_parameters()
-            for param in params.keys():
-                value = f"\"{params[param]}\"" \
-                    if isinstance(params[param], str) else f"{params[param]}"
-                print(param + "=" + value)
+            dictionary[f"device{i}"] = device.__properties__()
+
+        # print(json.dumps(dictionary, indent=4))
 
 
 def create_class_from_name(name: str = "") -> SUPPORTED_DEVICES:
