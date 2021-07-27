@@ -294,32 +294,31 @@ class NestThermostat(Devices.SmartDevice):
         self._logger.debug(
             f"Get fan timer active status for device {self._device_id}."
         )
-        return self.fan_timer_timeout > datetime.now()
+        return datetime.fromisoformat(self.fan_timer_timeout) > datetime.now()
 
     @ property
-    def fan_timer_timeout(self) -> datetime:
+    def fan_timer_timeout(self) -> str:
         """The time at which the fan timer will reach zero.
 
         Returns:
-            datetime.datetime: The time at which the fan will become
-            inactive.
+            str: The time at which the fan will become inactive.
         """
         self._logger.debug(
             f"Get fan timer timeout for device {self._device_id}."
         )
-        return datetime.now() + self.fan_timer_duration
+        return (datetime.now() + self._fan_timer_duration).isoformat()
 
     @ property
-    def fan_timer_duration(self) -> timedelta:
+    def fan_timer_duration(self) -> int:
         """Getter for fan timer duration.
 
         Returns:
-            datetime.datetime: The fan timer duration.
+            int: The fan timer duration, in minutes.
         """
         self._logger.debug(
             f"Get fan timer duration for device {self._device_id}."
         )
-        return self._fan_timer_duration
+        return self._fan_timer_duration.seconds / 60
 
     def set_fan_timer_duration(self, minutes: int = 5):
         """Setter for fan timer duration.
