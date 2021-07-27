@@ -6,13 +6,6 @@ from typing import List
 from devices import Devices
 
 
-# TEMPERATURE_SCALES = ["K", "C", "F"]
-# HVAC_MODES = ["heat", "cool", "heat-cool", "eco", "off"]
-# TIMES_TO_TARGET = ["~0", "<5", "~15", "~90", "120"]
-# TRAINING = ["training", "ready"]
-# DEGREES_PER_MINUTE = 1
-
-
 class NestThermostat(Devices.SmartDevice):
     """A smart thermostat class based on the Nest API.
 
@@ -26,6 +19,7 @@ class NestThermostat(Devices.SmartDevice):
     _degrees_per_minute: int = 1  # Currently unused.
     _api_return_parameters: List = [
         "device_id",
+        "device_type",
         "name",
         "status",
         "humidity",
@@ -366,17 +360,17 @@ class NestThermostat(Devices.SmartDevice):
         return self._hvac_mode == "eco"
 
     @ property
-    def humidity(self) -> float:
+    def humidity(self) -> int:
         """Returns the humidity measured by the thermostat as a
-        percentage between 0 and 1.
+        percentage between 0 and 100.
 
         Returns:
-            float: Percentage humidity, between 0 and 1 inclusive.
+            int: Percentage humidity, between 0 and 100 inclusive.
         """
         self._logger.debug(
             f"Get value of humidity for device {self._device_id}."
         )
-        return self._humidity
+        return round(self._humidity * 100)
 
     @ property
     def hvac_mode(self) -> str:
