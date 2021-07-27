@@ -204,7 +204,7 @@ class TestThermostats(unittest.TestCase):
             "sunlight_correction_enabled": False
         }
         file = os.path.join(
-            os.path.dirname(__file__), "thermostat-properties.json")
+            os.path.dirname(__file__), "test-thermostat-properties.json")
 
         fid = open(file, "w")
         fid.write(json.dumps(parameters, indent=4))
