@@ -1,5 +1,6 @@
 import os
 import sys
+import random
 
 from flask import Flask
 
@@ -13,8 +14,8 @@ except ModuleNotFoundError:
 
 app = Flask(__name__)
 config_name = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "home-1.ini")
-sh = SmartHome(config_name=config_name)
+    os.path.dirname(__file__)), "home-1.json")
+sh = SmartHome(json_file=config_name)
 
 # --------------------------- AUTHORIZATION -------------------------- #
 
@@ -33,13 +34,14 @@ def get_authorization():
 def get_token():
     return "here's your token: O"
 
-# -------------------------- THERMOSTAT ------------------------------ #
+# ---------------------------- DEVICES ------------------------------- #
 
 
 @app.route("/devices", methods=['GET', 'POST'])
 def get_devices():
-    lst = [f"{d.device_type}: {d.device_id}" for d in sh.devices]
-    return "<br>".join(lst)
+    return {
+        f"device{i}": j.__api__() for (i, j) in enumerate(sh.devices, start=1)
+    }
 
 
 @app.route("/devices/<device_type>", methods=["GET"])
@@ -49,15 +51,17 @@ def get_devices_by_type(device_type):
     elif device_type == "lights":
         devices = sh.get_devices_by_type("Light")
 
-    lst = [f"{d.device_type}: {d.device_id}" for d in devices]
-    return "<br>".join(lst)
+    return {
+        f"device{i}": j.__api__() for (i, j) in enumerate(devices, start=1)
+    }
 
 
 @app.route("/devices/<device_type>/<device_id>", methods=["GET"])
 def do_subpath(device_type, device_id):
     device = sh.get_device_by_device_id(device_id)
-    print(device)
-    return device._as_dict()
+    device._ambient_temperature = random.randint(293, 300)
+    device._humidity = random.random()
+    return device.__api__()
 
 
 @app.route("/locations", methods=["GET"])
@@ -66,5 +70,4 @@ def get_locations():
 
 
 if __name__ == "__main__":
-    print(sys.argv)
     app.run()
