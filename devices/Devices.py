@@ -2,6 +2,8 @@ import hashlib
 import logging
 import time
 
+from typing import List
+
 from datetime import datetime
 
 STATUSES = ["on", "off", "timer"]
@@ -33,6 +35,14 @@ class SmartDevice:
     events.
     """
     _device_type: str = "none"
+    _api_return_parameters: List = [
+        "device_type",
+        "name",
+        "device_id",
+        "software_version",
+        "is_online",
+        "last_connected"
+    ]
 
     def __init__(self, name: str = "unnamed", location: str = "none",
                  device_id: str = None, logger: logging.Logger = LOGGER):
@@ -61,6 +71,47 @@ class SmartDevice:
             + f"{self._software_version}, "
             + f"location -- {self._location}."
         )
+
+    def __api__(self) -> dict:
+        """Representation of the object state as a dictionary.
+
+        Returns:
+            dict: The state of the device to report in JSON messages.
+        """
+        return self.__as_json__(self._api_return_parameters)
+
+    def __as_json__(self, parameters: List) -> dict:
+        """Returns a dictionary of device properties from a list of
+        parameter names. Intended to be used with API queries and
+        internal state logging.
+
+        Args:
+            parameters (List): A list of the property names to return.
+        """
+
+        dictionary = {}
+        # Comprehensions doesn't work as expected with eval and self
+        for parameter in parameters:
+            dictionary.update({parameter: eval(f"self.{parameter}")})
+
+        return dictionary
+
+    def __from_json__(self, dictionary: dict):
+        """Set device parameters from dictionary. To be used with API
+        POST requests and configuration files.
+
+        Args:
+            dictionary (dict): The state to set the device to.
+        """
+
+        properties = dir(self)
+        for key in dictionary.keys():
+            parameter = f"set_{key}"
+            if parameter in properties:
+                eval(f"self.{parameter}(dictionary['{key}'])")
+            else:
+                self._logger.warning(
+                    f"No parameter matching '{parameter}' in object. Skipping")
 
     @property
     def device_id(self) -> str:
@@ -98,6 +149,15 @@ class SmartDevice:
         type (str): The type of the device.
         """
         self._device_type = type_
+
+    @property
+    def is_online(self) -> bool:
+        """Getter for is_online
+
+        Returns:
+            bool: Whether the device is online.
+        """
+        return self._is_online
 
     @property
     def location(self) -> str:
@@ -172,8 +232,7 @@ class SmartDevice:
         """
         if status in STATUSES:
             self._logger.info(
-                f"Set status of device {self._device_id}"
-                + f"to {status}.")
+                f"Set status of device {self._device_id} to {status}.")
             self._status = status
 
 

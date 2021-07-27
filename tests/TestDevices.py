@@ -41,6 +41,24 @@ class TestDevices(unittest.TestCase):
         d.set_name("New name")
         assert_that(d.name, is_(equal_to("New name")))
 
+    def test_set_from_json(self):
+        d = Devices.SmartDevice()
+
+        properties = {"name": "test",
+                      "location": "software",
+                      "device_id": "abcd",
+                      "device_type": "fake",
+                      "status": "timer"}
+        d.__from_json__(properties)
+        for k in properties.keys():
+            assert_that(eval(f"d.{k}"), is_(equal_to(properties[k])))
+
+        api_properties = d.__as_json__(properties.keys())
+        assert_that(api_properties, is_(equal_to(properties)))
+
+        api_keys = list(d.__api__().keys())
+        assert_that(api_keys, is_(equal_to(d._api_return_parameters)))
+
     def test_set_location(self):
         d = Devices.SmartDevice()
         d.set_location("New Location")
