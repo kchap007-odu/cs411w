@@ -26,16 +26,7 @@ class PhilipsHueLamp(SmartDevice):
         return self._rgb_color
 
     def set_rgb_color(self, color: List[int] = [255, 255, 255]):
-        pass
-
-    def as_dict(self):
-        return {
-            "device_type": self.device_type,
-            "device_id": self.device_id,
-            "name": self.name,
-            "brightness": self.brightness
-            # "rgb_color": self.rgb_color
-        }
+        self._rgb_color = color
 
 
 class State:
