@@ -49,11 +49,11 @@
         },
         "device3":
         {
-            "class": "PhillipsHueLamp",
+            "class": "PhilipsHueLamp",
             "device_type": "Light",
             "device_id": "3456",
             "location": "Desk",
-            "name": "Phillips Hue Lamp",
+            "name": "Philips Hue Lamp",
             "brightness": 1.0
         }
     }
