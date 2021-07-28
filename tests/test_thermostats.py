@@ -105,6 +105,8 @@ class TestNestThermostat(unittest.TestCase):
             assert_that(t.hvac_mode, is_(mode))
             assert_that(t.previous_hvac_mode, is_(previous))
             previous = t.hvac_mode
+            # All temperatures should default to zero.
+            assert_that(t.target_temperature, is_(equal_to(0)))
 
     def test_set_is_locked(self):
         t = Thermostat.NestThermostat()

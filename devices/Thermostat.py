@@ -65,7 +65,7 @@ class NestThermostat(SmartDevice):
             f"Device {self._device_id} is now a {self._device_type}."
         )
 
-    def __properties__(self):
+    def __properties__(self) -> dict:
         """Getter for settable parameters. Intended to be used to log
         the state of the simulated device to store in a configuration
         file.
@@ -691,7 +691,6 @@ class NestThermostat(SmartDevice):
             int: The target temperature in units specified by
             temperature scale.
         """
-        # TODO: Force this to return an int.
         # TODO: Find a better way to do this. This is ugly.
         if self._hvac_mode == "cool":
             return self.target_temperature_low
@@ -699,15 +698,17 @@ class NestThermostat(SmartDevice):
             return self.target_temperature_high
         elif self._hvac_mode == "heat-cool":
             # TODO: Fix this so that heat or cool is chosen.
-            if self.ambient_temperature_c > self.target_temperature_c:
+            if self._ambient_temperature >= self._target_temperature:
                 return self.target_temperature_low
-            elif self.ambient_temperature_c < self.target_temperature_c:
+            elif self._ambient_temperature <= self._target_temperature:
                 return self.target_temperature_high
         elif self._hvac_mode == "eco":
-            if self.ambient_temperature_c > self.target_temperature_c:
+            if self._ambient_temperature >= self._target_temperature:
                 return self.eco_temperature_low
-            elif self.ambient_temperature_c < self.target_temperature_c:
+            elif self._ambient_temperature <= self._target_temperature:
                 return self.eco_temperature_high
+        elif self._hvac_mode == "off":
+            return self.ambient_temperature
 
     @ property
     def target_temperature_f(self) -> float:
