@@ -4,8 +4,8 @@ import time
 from typing import List, Union
 
 from devices.Light import PhilipsHueLamp
-from devices.Thermostat import NestThermostat
-from devices.Faucet import Faucet
+from devices.thermostats import NestThermostat
+# from devices.Faucet import Faucet  # Getting invalid syntax error.
 from devices.Refrigerator import Refrigerator
 from devices.water_heater import water_heater
 
@@ -15,7 +15,7 @@ SupportedDevices = Union[
     PhilipsHueLamp,
     Refrigerator,
     NestThermostat,
-    Faucet,
+    # Faucet,
     water_heater
 ]
 
