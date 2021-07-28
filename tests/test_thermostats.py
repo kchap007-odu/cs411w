@@ -5,7 +5,7 @@ import os
 from hamcrest import assert_that, close_to, contains_string, equal_to, is_,\
     is_not, string_contains_in_order
 
-from devices import Thermostat
+from devices.thermostats import NestThermostat
 
 
 class TestNestThermostat(unittest.TestCase):
@@ -40,19 +40,19 @@ class TestNestThermostat(unittest.TestCase):
         """Tests the constructor for NestThermostat class. Covers
         default constructor and constructor with arguments.
         """
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
         assert_that(t.name_long, string_contains_in_order(
             "none", "Thermostat", "none"))
 
-        t = Thermostat.NestThermostat(name="Nest", location="Living Room")
+        t = NestThermostat(name="Nest", location="Living Room")
         assert_that(t.name_long, string_contains_in_order(
             "Nest", "Thermostat", "Living Room"))
 
     def test_multiple_instances(self):
         """Tests whether instance variables are unique to instances.
         """
-        instance_one = Thermostat.NestThermostat()
-        instance_two = Thermostat.NestThermostat()
+        instance_one = NestThermostat()
+        instance_two = NestThermostat()
 
         instance_one.set_is_locked(False)
         assert_that(instance_one.is_locked, is_(False))
@@ -63,7 +63,7 @@ class TestNestThermostat(unittest.TestCase):
         assert_that(instance_one.is_locked, is_not(instance_two.is_locked))
 
     def test__from_json__(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for scale in t._temperature_scales:
             params = {"temperature_scale": scale}
@@ -95,7 +95,7 @@ class TestNestThermostat(unittest.TestCase):
                 assert_that(eval(f"t.{k}"), is_(equal_to(v)))
 
     def test_set_eco_temperature_high(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for scale, value in zip(self._scales, self._values):
             t.set_temperature_scale(scale)
@@ -104,7 +104,7 @@ class TestNestThermostat(unittest.TestCase):
                         is_(close_to(value, self._tolerance)))
 
     def test_set_eco_temperature_low(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for scale, value in zip(self._scales, self._values):
             t.set_temperature_scale(scale)
@@ -115,21 +115,21 @@ class TestNestThermostat(unittest.TestCase):
     def test_set_fan_timer_duration(self):
         """Tests the ability to set the fan timer duration.
         """
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for duration in self._durations:
             t.set_fan_timer_duration(minutes=duration)
             assert_that(t.fan_timer_duration, is_(duration))
 
     def test_set_has_fan(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for value in self._boolean_values:
             t.set_has_fan(value)
             assert_that(t.has_fan, is_(value))
 
     def test_set_hvac_mode(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
         previous = t.hvac_mode
 
         for mode in t._hvac_modes:
@@ -142,14 +142,14 @@ class TestNestThermostat(unittest.TestCase):
             previous = t.hvac_mode
 
     def test_set_is_locked(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for locked in self._boolean_values:
             t.set_is_locked(locked)
             assert_that(t.is_locked, is_(locked))
 
     def test_set_label(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for label in self._labels:
             t.set_label(label)
@@ -157,7 +157,7 @@ class TestNestThermostat(unittest.TestCase):
             assert_that(t.name_long, contains_string(label))
 
     def test_set_locked_temp_max(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for scale, value in zip(self._scales, self._values):
             t.set_temperature_scale(scale)
@@ -166,7 +166,7 @@ class TestNestThermostat(unittest.TestCase):
                         is_(close_to(value, self._tolerance)))
 
     def test_set_locked_temp_min(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for scale, value in zip(self._scales, self._values):
             t.set_temperature_scale(scale)
@@ -175,28 +175,28 @@ class TestNestThermostat(unittest.TestCase):
                         is_(close_to(value, self._tolerance)))
 
     def test_set_previous_hvac_mode(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for value in t._hvac_modes:
             t.set_previous_hvac_mode(value)
             assert_that(t.previous_hvac_mode, is_(equal_to(value)))
 
     def test_set_sunlight_correction_active(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for value in self._boolean_values:
             t.set_sunlight_correction_active(value)
             assert_that(t.sunlight_correction_active, is_(equal_to(value)))
 
     def test_set_sunlight_correction_enabled(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for value in self._boolean_values:
             t.set_sunlight_correction_enabled(value)
             assert_that(t.sunlight_correction_enabled, is_(equal_to(value)))
 
     def test_set_target_temperature_high(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for scale, value in zip(self._scales, self._values):
             t.set_temperature_scale(scale)
@@ -205,7 +205,7 @@ class TestNestThermostat(unittest.TestCase):
                         is_(close_to(value, self._tolerance)))
 
     def test_set_target_temperature_low(self):
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for scale, value in zip(self._scales, self._values):
             t.set_temperature_scale(scale)
@@ -217,7 +217,7 @@ class TestNestThermostat(unittest.TestCase):
         """Tests the ability to change the temperature scale of the
         device.
         """
-        t = Thermostat.NestThermostat()
+        t = NestThermostat()
 
         for scale in t._temperature_scales:
             t.set_temperature_scale(scale)

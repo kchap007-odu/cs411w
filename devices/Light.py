@@ -1,9 +1,9 @@
 from typing import List
 
-from devices import Devices
+from devices.devices import SmartDevice
 
 
-class PhilipsHueLamp(Devices.SmartDevice):
+class PhilipsHueLamp(SmartDevice):
 
     _device_type = "Light"
 

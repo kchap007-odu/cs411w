@@ -3,8 +3,8 @@ import unittest
 
 from hamcrest import assert_that, equal_to, is_, instance_of
 
-from smarthome.SmartHome import SmartHome
-from devices.Thermostat import NestThermostat
+from smarthome.smarthomes import SmartHome
+from devices.thermostats import NestThermostat
 
 from helpers.misc import json_from_file
 
