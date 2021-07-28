@@ -3,7 +3,7 @@ import locale
 from datetime import datetime, timedelta
 from typing import List
 
-from devices.Devices import SmartDevice
+from devices.devices import SmartDevice
 
 from helpers.unitconverters import celsius_to_fahrenheit, celsius_to_kelvin, \
     fahrenheit_to_celsius, kelvin_to_celsius
