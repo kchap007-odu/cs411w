@@ -1,4 +1,5 @@
-# import logging
+import json
+
 from logging import getLogger, Formatter, FileHandler, StreamHandler, \
     Logger, WARNING, DEBUG
 
@@ -34,3 +35,19 @@ def create_logger(filename: str = "default_logger.log",
     log.addHandler(ch)
 
     return log
+
+
+def json_from_file(filename: str) -> dict:
+    """Reads a .json formatted file and converts the contents to a
+    Python dict.
+
+    Args:
+        filename (str): The fully qualified path to the file.
+
+    Returns:
+        dict: The contents of the specified file as a dictionary.
+    """
+    with open(filename) as f:
+        result = json.loads(f.read())
+
+    return result
