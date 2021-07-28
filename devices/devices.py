@@ -49,6 +49,9 @@ class SmartDevice:
             + f"location -- {self._location}."
         )
 
+    def __getitem__(self, key: str):
+        return eval(f"self.{key}") if key in dir(self) else None
+
     def __api__(self) -> dict:
         """Representation of the object state as a dictionary.
 
