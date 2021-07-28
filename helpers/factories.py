@@ -1,3 +1,5 @@
+import logging
+
 from typing import Union
 
 from devices.lights import PhilipsHueLamp
@@ -23,7 +25,8 @@ SupportedDevicesString = [
 ]
 
 
-def device_factory(name: str = "", config: dict = None) -> SupportedDevices:
+def device_factory(name: str = "", config: dict = None,
+                   logger: logging.Logger = None) -> SupportedDevices:
     """Helper function to construct supported classes from class names
     stored in the ini file.
 
@@ -35,7 +38,7 @@ def device_factory(name: str = "", config: dict = None) -> SupportedDevices:
         SupportedDevices: The class of device specified by name.
     """
     if name in SupportedDevicesString:
-        device = eval(f"{name}()")
+        device = eval(f"{name}(logger=logger)")
 
     if config is not None:
         device.__from_json__(config)

@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from devices.devices import SmartDevice
@@ -7,8 +8,9 @@ class PhilipsHueLamp(SmartDevice):
 
     _device_type = "Light"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, location: str = "none", name: str = "none",
+                 logger: logging.Logger = None):
+        super().__init__(location=location, name=name, logger=logger)
 
         self.set_rgb_color([255, 255, 255])
         self.set_brightness(1.0)

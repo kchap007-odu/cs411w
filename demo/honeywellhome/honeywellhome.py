@@ -1,15 +1,16 @@
 import os
 import sys
 import random
+import json
 
 from flask import Flask
 
 # FIXME: There's no way this is the right way to handle this.
 try:
-    from smarthome.SmartHome import SmartHome
+    from smarthome.smarthomes import SmartHome
 except ModuleNotFoundError:
     sys.path.append(os.path.dirname(__file__) + "/../..")
-    from smarthome.SmartHome import SmartHome
+    from smarthome.smarthomes import SmartHome
 
 
 app = Flask(__name__)
@@ -37,19 +38,24 @@ def get_token():
 # ---------------------------- DEVICES ------------------------------- #
 
 
+@app.route("/")
+def get_config():
+    return json.loads(str(sh))
+
+
 @app.route("/devices", methods=['GET', 'POST'])
 def get_devices():
     return {
-        f"device{i}": j.__api__() for (i, j) in enumerate(sh.devices, start=1)
+        f"device{i}": j.__api__() for (i, j) in enumerate(sh._devices, start=1)
     }
 
 
 @app.route("/devices/<device_type>", methods=["GET"])
 def get_devices_by_type(device_type):
     if device_type == "thermostats":
-        devices = sh.get_devices_by_type("Thermostat")
+        devices = sh[{"device_type": "Thermostat"}]
     elif device_type == "lights":
-        devices = sh.get_devices_by_type("Light")
+        devices = sh[{"device_type": "Light"}]
 
     return {
         f"device{i}": j.__api__() for (i, j) in enumerate(devices, start=1)
@@ -58,7 +64,7 @@ def get_devices_by_type(device_type):
 
 @app.route("/devices/<device_type>/<device_id>", methods=["GET"])
 def do_subpath(device_type, device_id):
-    device = sh.get_device_by_device_id(device_id)
+    device = sh[device_id]
     device._ambient_temperature = random.randint(293, 300)
     device._humidity = random.random()
     return device.__api__()
