@@ -3,29 +3,8 @@ import time
 
 from typing import List, Union
 
-from devices.Light import PhilipsHueLamp
-from devices.thermostats import NestThermostat
-# from devices.Faucet import Faucet  # Getting invalid syntax error.
-from devices.Refrigerator import Refrigerator
-from devices.water_heater import water_heater
-
+from helpers.factories import SupportedDevices, device_factory
 from helpers.misc import json_from_file
-
-SupportedDevices = Union[
-    PhilipsHueLamp,
-    Refrigerator,
-    NestThermostat,
-    # Faucet,
-    water_heater
-]
-
-SupportedDevicesString = [
-    "PhilipsHueLamp",
-    "Refrigerator",
-    "NestThermostat",
-    "Faucet",
-    "water_heater"
-]
 
 
 class SmartHome():
@@ -49,7 +28,6 @@ class SmartHome():
         self.set_state("None")
         self.set_country("None")
         self.set_zipcode("None")
-        self.set_config_name: Union(str, None) = json_file
 
         self._devices: List[SupportedDevices] = []
 
@@ -71,7 +49,7 @@ class SmartHome():
             if parameter in properties:
                 eval(f"self.{parameter}(json_data['{k}'])")
 
-    def __getitem__(self, key: Union[int, str]) -> SupportedDevices:
+    def __getitem__(self, key: Union[int, str, dict]) -> SupportedDevices:
         if isinstance(key, str):
             # Do search by device id
             for device in self._devices:
@@ -79,6 +57,18 @@ class SmartHome():
                     return device
         elif isinstance(key, int):
             return self._devices[key]
+        elif isinstance(key, dict):
+            devices = []
+            for device in self._devices:
+                all_match = True
+                for k, v in key.items():
+                    if device[k] != v:
+                        all_match = False
+                        break
+                if all_match:
+                    devices.append(device)
+            return devices
+
         return None
 
     def __len__(self):
@@ -159,23 +149,3 @@ class SmartHome():
             List: A list of all devices with a matching type.
         """
         return [i for i in self._devices if i.device_type == type_]
-
-
-def device_factory(name: str = "", config: dict = None) -> SupportedDevices:
-    """Helper function to construct supported classes from class names
-    stored in the ini file.
-
-    Args:
-        name (str, optional): The name of the class to create. Defaults
-        to "".
-
-    Returns:
-        SupportedDevices: The class of device specified by name.
-    """
-    if name in SupportedDevicesString:
-        device = eval(f"{name}()")
-
-    if config is not None:
-        device.__from_json__(config)
-
-    return device
