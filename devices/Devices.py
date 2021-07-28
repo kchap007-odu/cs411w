@@ -1,27 +1,11 @@
-import hashlib
 import logging
 import time
 
-from typing import List
+from typing import List, Union
 
 from datetime import datetime
 
-STATUSES = ["on", "off", "timer"]
-SOFTWARE_VERSION = datetime.strptime("2021.07.13", "%Y.%m.%d")
-
-LOGGER = logging.getLogger(__name__)
-LOGGER.setLevel(logging.DEBUG)
-formatter = logging.Formatter(
-    '%(asctime)s - %(filename)s - %(lineno)s - %(levelname)s - %(message)s')
-fh = logging.FileHandler('SmartDevice.log')
-fh.setLevel(logging.DEBUG)
-fh.setFormatter(formatter)
-
-ch = logging.StreamHandler()
-ch.setLevel(logging.ERROR)
-ch.setFormatter(formatter)
-LOGGER.addHandler(fh)
-LOGGER.addHandler(ch)
+from helpers.misc import create_logger
 
 
 class SmartDevice:
@@ -44,27 +28,20 @@ class SmartDevice:
         "last_connected"
     ]
 
+    _statuses: List[str] = ["on", "off", "timer"]
+    _software_version: datetime = datetime.strptime("2021.07.13", "%Y.%m.%d")
+
     def __init__(self, name: str = "unnamed", location: str = "none",
-                 device_id: str = None, logger: logging.Logger = LOGGER):
+                 device_id: Union[str, None] = None,
+                 logger: logging.Logger = create_logger()):
+        self.set_device_id(device_id)
+        self.set_is_online(True)
         self.set_name(name)
         self.set_location(location)
-        self._software_version = SOFTWARE_VERSION
-        self._logger = logger
-        self._is_online: bool = True
-        self._software_version: datetime = datetime.strptime(
-            "1970.01.01", "%Y.%m.%d"
-        )
-        self._status: str = "off"
-        self.last_connected: datetime = datetime.fromtimestamp(0.0)
+        self._logger: logging.Logger = logger
+        self.set_status("off")
+        self.set_last_connected(datetime.now())
 
-        if device_id is not None:
-            self._device_id = device_id
-        else:
-            # TODO: Clean this up. Or find a better way to generate
-            # unique device id.
-            self._device_id = hashlib.md5(
-                bytes(str(int(time.time()*1000)), encoding="utf-8")
-            ).hexdigest()
         self._logger.debug(
             f"Created device {self._device_id} with name -- "
             + f"{self._name}, software version -- "
@@ -78,6 +55,7 @@ class SmartDevice:
         Returns:
             dict: The state of the device to report in JSON messages.
         """
+        self.set_last_connected(datetime.now())
         return self.__as_json__(self._api_return_parameters)
 
     def __as_json__(self, parameters: List) -> dict:
@@ -140,13 +118,15 @@ class SmartDevice:
         )
         return self._device_id
 
-    def set_device_id(self, value: str = ""):
-        """Setter for device_id.
+    def set_device_id(self, id_: Union[str, None] = None):
+        """Setter for device_id. If device_id is None, a random unique
+        id is generated.
 
-        Parameters:
-        value (str): The value to set device_id to.
+        Args:
+            device_id (Union[str, None], optional): The value to set
+            device_id to. Defaults to None.
         """
-        self._device_id = value
+        self._device_id = f"{hash(time.time()): X}" if id_ is None else id_
 
     @property
     def device_type(self) -> str:
@@ -170,9 +150,31 @@ class SmartDevice:
         """Getter for is_online
 
         Returns:
-            bool: Whether the device is online.
+            bool: Whether the device is online. Always returns true.
         """
         return self._is_online
+
+    def set_is_online(self, online: bool = True):
+        self._is_online = online
+
+    @property
+    def last_connected(self) -> str:
+        """Getter for last connected date.
+
+        Returns:
+            str: The timestamp of last connection, as iso formmated
+            string.
+        """
+        return self._last_connected.isoformat()
+
+    def set_last_connected(self, date: datetime):
+        """Setter for datetime of last connect.
+
+        Args:
+            date (datetime): The datetime which the device was last
+            connected.
+        """
+        self._last_connected = date
 
     @property
     def location(self) -> str:
@@ -183,13 +185,13 @@ class SmartDevice:
         """
         return self._location
 
-    def set_location(self, value: str = "none"):
+    def set_location(self, location: str = "none"):
         """Setter for location attribute.
 
         Parameters:
         value(str): The value to set location to.
         """
-        self._location = value
+        self._location = location
 
     @property
     def name_long(self) -> str:
@@ -209,13 +211,13 @@ class SmartDevice:
         """
         return self._name
 
-    def set_name(self, value: str = ""):
+    def set_name(self, name: str = ""):
         """Setter method for device name.
 
         Parameters:
         value (str): The value to set name to.
         """
-        self._name = value
+        self._name = name
 
     @property
     def software_version(self) -> str:
@@ -245,11 +247,7 @@ class SmartDevice:
         status (str): The target status of the device. Must be "on",
         "off", or "timer".
         """
-        if status in STATUSES:
+        if status in self._statuses:
             self._logger.info(
                 f"Set status of device {self._device_id} to {status}.")
             self._status = status
-
-
-if __name__ == "__main__":
-    pass
