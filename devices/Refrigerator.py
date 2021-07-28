@@ -3,19 +3,19 @@ from random import randrange
 
 class Refrigerator:
     def current_fridge_temperature(self):
-        return randrange(30, 35)
+        return randrange
 
     def target_fridge_temperature(self):
-        return randrange(35, 40)
+        return randrange
 
     def current_freezer_temperature(self):
-        return randrange(5, 10)
+        return randrange
 
     def target_freezer_temperature(self):
-        return randrange(0, 4)
+        return randrange
 
     def energy_use(self):
-        return randrange(100, 400)
+        return randrange
 
 
 if __name__ == '__main__':
