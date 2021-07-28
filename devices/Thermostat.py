@@ -340,7 +340,7 @@ class NestThermostat(SmartDevice):
             bool: Always true.
         """
         self._logger.debug(f"Get fan status for device {self._device_id}.")
-        return True
+        return self._has_fan
 
     def set_has_fan(self, value: bool = True):
         """Setter for has_fan property.
