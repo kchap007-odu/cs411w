@@ -4,19 +4,19 @@ import json
 
 class Refrigerator:
     def current_fridge_temperature(self):
-        return randrange
+        return randrange(30, 35)
 
     def target_fridge_temperature(self):
-        return randrange
+        return randrange(35, 40)
 
     def current_freezer_temperature(self):
-        return randrange
+        return randrange(5, 10)
 
     def target_freezer_temperature(self):
-        return randrange
+        return randrange(0, 4)
 
     def energy_use(self):
-        return randrange
+        return randrange(100, 400)
 
 
 if __name__ == '__main__':
