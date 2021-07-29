@@ -51,6 +51,7 @@ if __name__ == '__main__':
     # printing results list of dicts in json format, with 4 as indentation
     print(json.dumps(results, indent=4))
 
-    f = open('output.json', 'w')
+    # outputs json file
+    f = open('data_chart.json', 'w')
     json.dump(results, f)
     f.close()
