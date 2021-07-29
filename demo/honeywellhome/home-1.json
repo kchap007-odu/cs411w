@@ -1,6 +1,11 @@
 {
-"name": "Home",
-"address": "1234 Test Lane",
+"name": "Office",
+"street_address": "1100 H Dragas Hall",
+"city": "Norfolk",
+"state": "VA",
+"zipcode": "23529",
+"country": "US",
+"location_id": 1234567890,
 "devices":
     {
         "device1":

@@ -1,11 +1,13 @@
 import logging
 import time
 
+from datetime import datetime
 from typing import List, Union
 
-from datetime import datetime
+from helpers.misc import create_logger, log_message_formatter
 
-from helpers.misc import create_logger
+SOFTWARE_VERSION = "2021.07.28"
+SOFTWARE_VERSION_FORMAT = "%Y.%m.%d"
 
 
 class SmartDevice:
@@ -27,27 +29,32 @@ class SmartDevice:
         "is_online",
         "last_connected"
     ]
+    _software_version_format = "%Y.%m.%d"
+    _software_version_string = "2021.07.28"
 
     _statuses: List[str] = ["on", "off", "timer"]
-    _software_version: datetime = datetime.strptime("2021.07.13", "%Y.%m.%d")
 
     def __init__(self, name: str = "unnamed", location: str = "none",
                  device_id: Union[str, None] = None,
-                 logger: logging.Logger = create_logger()):
+                 logger: logging.Logger = None):
+        self.set_logger(logger)
         self.set_device_id(device_id)
         self.set_is_online(True)
         self.set_name(name)
         self.set_location(location)
-        self._logger: logging.Logger = logger
+        self.set_software_version(self._software_version_string)
         self.set_status("off")
-        self.set_last_connected(datetime.now())
+        self.set_last_connected(datetime.now().isoformat())
 
         self._logger.debug(
-            f"Created device {self._device_id} with name -- "
-            + f"{self._name}, software version -- "
-            + f"{self._software_version}, "
-            + f"location -- {self._location}."
+            f"create {self} name -- "
+            + f"{self.name}, software_version -- "
+            + f"{self.software_version}, "
+            + f"location -- {self.location}."
         )
+
+    def __getitem__(self, key: str):
+        return eval(f"self.{key}") if key in dir(self) else None
 
     def __api__(self) -> dict:
         """Representation of the object state as a dictionary.
@@ -55,7 +62,7 @@ class SmartDevice:
         Returns:
             dict: The state of the device to report in JSON messages.
         """
-        self.set_last_connected(datetime.now())
+        self.set_last_connected(datetime.now().isoformat())
         return self.__as_json__(self._api_return_parameters)
 
     def __as_json__(self, parameters: List) -> dict:
@@ -81,15 +88,13 @@ class SmartDevice:
         Args:
             dictionary (dict): The state to set the device to.
         """
-
-        properties = dir(self)
         for key in dictionary.keys():
             parameter = f"set_{key}"
-            if parameter in properties:
+            if parameter in dir(self):
                 eval(f"self.{parameter}(dictionary['{key}'])")
             else:
                 self._logger.warning(
-                    f"No parameter matching '{parameter}' in object. Skipping")
+                    f"abort set -- '{parameter}' not in {self.device_type}")
 
     def __properties__(self):
         """Getter for settable parameters. Intended to be used to log
@@ -106,16 +111,17 @@ class SmartDevice:
 
         return self.__as_json__(parameters)
 
-    @property
+    def __repr__(self):
+        return f"[device_id: {self.device_id}]"
+
+    @ property
     def device_id(self) -> str:
         """Getter for unique device identifier.
 
         Returns:
         str: The unique identifier of the device.
         """
-        self._logger.debug(
-            f"Get value of device_id for device {self._device_id}"
-        )
+        self._logger.debug("get device_id.")
         return self._device_id
 
     def set_device_id(self, id_: Union[str, None] = None):
@@ -126,9 +132,9 @@ class SmartDevice:
             device_id (Union[str, None], optional): The value to set
             device_id to. Defaults to None.
         """
-        self._device_id = f"{hash(time.time()): X}" if id_ is None else id_
+        self._device_id = f"{hash(time.time()):016X}" if id_ is None else id_
 
-    @property
+    @ property
     def device_type(self) -> str:
         """Getter for device type.
 
@@ -143,9 +149,10 @@ class SmartDevice:
         Parameters:
         type (str): The type of the device.
         """
+        self._logger.info(f"{self} is now a {type_}.")
         self._device_type = type_
 
-    @property
+    @ property
     def is_online(self) -> bool:
         """Getter for is_online
 
@@ -156,8 +163,10 @@ class SmartDevice:
 
     def set_is_online(self, online: bool = True):
         self._is_online = online
+        self._logger.info(log_message_formatter(
+            "set", f"{self}", "is_online", online))
 
-    @property
+    @ property
     def last_connected(self) -> str:
         """Getter for last connected date.
 
@@ -165,24 +174,29 @@ class SmartDevice:
             str: The timestamp of last connection, as iso formmated
             string.
         """
+        self._logger.debug(log_message_formatter(
+            "get", f"{self}", "last_connected"))
         return self._last_connected.isoformat()
 
-    def set_last_connected(self, date: datetime):
+    def set_last_connected(self, date_: str):
         """Setter for datetime of last connect.
 
         Args:
             date (datetime): The datetime which the device was last
             connected.
         """
-        self._last_connected = date
+        self._last_connected = datetime.fromisoformat(date_)
+        self._logger.info(log_message_formatter(
+            "set", f"{self}", "last_connected", date_))
 
-    @property
+    @ property
     def location(self) -> str:
         """Getter for location.
 
         Returns:
         (str): The location of the device.
         """
+        self._logger.debug(log_message_formatter("get", f"{self}", "location"))
         return self._location
 
     def set_location(self, location: str = "none"):
@@ -191,24 +205,38 @@ class SmartDevice:
         Parameters:
         value(str): The value to set location to.
         """
+        self._logger.info(log_message_formatter(
+            "set", f"{self}", "location", location))
         self._location = location
 
-    @property
+    def set_logger(self, logger: logging.Logger = None):
+        if logger is None:
+            logger: logging.Logger = create_logger()
+            self._logger.warning("Using default logger.")
+        self._logger = logger
+        self._logger.info("set logger.")
+
+    @ property
     def name_long(self) -> str:
         """Getter for long name.
 
         Returns:
         str: The long form name of the smart device.
         """
+        self._logger.debug(log_message_formatter(
+            "get", f"{self}", "name_long"))
         return f"{self._name} {self._device_type} ({self._location})"
 
-    @property
+    @ property
     def name(self) -> str:
         """Getter for device name.
 
         Returns:
         str: The device name.
         """
+
+        self._logger.debug(log_message_formatter(
+            "get", f"{self}", "name"))
         return self._name
 
     def set_name(self, name: str = ""):
@@ -218,26 +246,42 @@ class SmartDevice:
         value (str): The value to set name to.
         """
         self._name = name
+        self._logger.info(log_message_formatter(
+            "set", f"{self}", "name", name))
 
-    @property
+    @ property
     def software_version(self) -> str:
         """Getter for software version.
 
         Returns:
         str: The software version.
         """
-        return datetime.strftime(self._software_version, "%Y.%M.%d")
 
-    @property
+        self._logger.debug(log_message_formatter(
+            "get", f"{self}", "software_version"))
+        return datetime.strftime(self._software_version, "%Y.%m.%d")
+
+    def set_software_version(self, version_number: str):
+        """Setter for software version.
+
+        Args:
+            version_number (str): The version number. Expected format is
+            strptime format %Y.%m.%d.
+        """
+        self._software_version = datetime.strptime(
+            version_number, self._software_version_format)
+        self._logger.info(log_message_formatter(
+            "set", f"{self}", "software_version", version_number))
+
+    @ property
     def status(self) -> str:
         """Getter for status.
 
         Returns:
         str: The current status of the device.
         """
-        self._logger.debug(
-            f"Get value of status for device {self._device_id}"
-        )
+
+        self._logger.debug(log_message_formatter("get", f"{self}", "status"))
         return self._status
 
     def set_status(self, status: str = "off"):
@@ -248,6 +292,9 @@ class SmartDevice:
         "off", or "timer".
         """
         if status in self._statuses:
-            self._logger.info(
-                f"Set status of device {self._device_id} to {status}.")
             self._status = status
+            self._logger.info(log_message_formatter(
+                "set", f"{self}", "status", self._status))
+        else:
+            self._logger.warning(
+                f"abort set {self} status -- not in {self._statuses}.")

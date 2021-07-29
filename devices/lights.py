@@ -1,3 +1,4 @@
+import logging
 from typing import List
 
 from devices.devices import SmartDevice
@@ -7,8 +8,9 @@ class PhilipsHueLamp(SmartDevice):
 
     _device_type = "Light"
 
-    def __init__(self):
-        super().__init__()
+    def __init__(self, location: str = "none", name: str = "none",
+                 logger: logging.Logger = None):
+        super().__init__(location=location, name=name, logger=logger)
 
         self.set_rgb_color([255, 255, 255])
         self.set_brightness(1.0)
@@ -26,16 +28,7 @@ class PhilipsHueLamp(SmartDevice):
         return self._rgb_color
 
     def set_rgb_color(self, color: List[int] = [255, 255, 255]):
-        pass
-
-    def as_dict(self):
-        return {
-            "device_type": self.device_type,
-            "device_id": self.device_id,
-            "name": self.name,
-            "brightness": self.brightness
-            # "rgb_color": self.rgb_color
-        }
+        self._rgb_color = color
 
 
 class State:

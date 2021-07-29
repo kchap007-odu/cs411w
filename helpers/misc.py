@@ -1,5 +1,7 @@
 import json
 
+from typing import Union
+
 from logging import getLogger, Formatter, FileHandler, StreamHandler, \
     Logger, WARNING, DEBUG
 
@@ -35,6 +37,21 @@ def create_logger(filename: str = "default_logger.log",
     log.addHandler(ch)
 
     return log
+
+
+def log_message_formatter(get_set: str, device_id: str, property_:
+                          str, value: Union[str, int] = None):
+    if isinstance(value, str):
+        value = f"'{value}'"
+
+    message = f"{get_set} {device_id} {property_}"
+
+    if "set" in get_set:
+        message += f" to {value}."
+    else:
+        message += "."
+
+    return message
 
 
 def json_from_file(filename: str) -> dict:

@@ -1,31 +1,11 @@
 import json
+import logging
 import time
 
 from typing import List, Union
 
-from devices.Light import PhilipsHueLamp
-from devices.thermostats import NestThermostat
-# from devices.Faucet import Faucet  # Getting invalid syntax error.
-from devices.Refrigerator import Refrigerator
-from devices.water_heater import water_heater
-
-from helpers.misc import json_from_file
-
-SupportedDevices = Union[
-    PhilipsHueLamp,
-    Refrigerator,
-    NestThermostat,
-    # Faucet,
-    water_heater
-]
-
-SupportedDevicesString = [
-    "PhilipsHueLamp",
-    "Refrigerator",
-    "NestThermostat",
-    "Faucet",
-    "water_heater"
-]
+from helpers.factories import SupportedDevices, device_factory
+from helpers.misc import json_from_file, create_logger
 
 
 class SmartHome():
@@ -40,8 +20,9 @@ class SmartHome():
         the configuration data.
     """
 
-    def __init__(self, json_file: str = None):
+    def __init__(self, json_file: str = None, logger: logging.Logger = None):
         # TODO: Need to convert from pascalCase to snake_case on input.
+        self.set_logger(logger)
         self.set_location_id(hash(time.time()))
         self.set_name("None")
         self.set_street_address("None")
@@ -49,7 +30,6 @@ class SmartHome():
         self.set_state("None")
         self.set_country("None")
         self.set_zipcode("None")
-        self.set_config_name: Union(str, None) = json_file
 
         self._devices: List[SupportedDevices] = []
 
@@ -62,7 +42,7 @@ class SmartHome():
         available_devices = json_data.pop("devices", None)
         if available_devices is not None:
             for v in available_devices.values():
-                self.append(device_factory(v.pop("class"), v))
+                self.append(device_factory(v.pop("class"), v, self._logger))
 
         # Set the home properties.
         properties = dir(self)
@@ -71,14 +51,28 @@ class SmartHome():
             if parameter in properties:
                 eval(f"self.{parameter}(json_data['{k}'])")
 
-    def __getitem__(self, key: Union[int, str]) -> SupportedDevices:
+    def __getitem__(self, key: Union[int, str, dict]) -> SupportedDevices:
+        # Search by device id
         if isinstance(key, str):
-            # Do search by device id
             for device in self._devices:
                 if device.device_id == key:
                     return device
+        # Search by index.
         elif isinstance(key, int):
             return self._devices[key]
+        # Search by multiple key-value pairs.
+        elif isinstance(key, dict):
+            devices = []
+            for device in self._devices:
+                all_match = True
+                for k, v in key.items():
+                    if device[k] != v:
+                        all_match = False
+                        break
+                if all_match:
+                    devices.append(device)
+            return devices
+
         return None
 
     def __len__(self):
@@ -90,13 +84,24 @@ class SmartHome():
             self._devices[key] = value
 
     def __str__(self):
-        dictionary = {}
+        dictionary = {
+            "location_id": self.location_id,
+            "name": self.name,
+            "street_address": self.street_address,
+            "city": self.city,
+            "state": self.state,
+            "zipcode": self.zipcode,
+            "devices": {}
+        }
         for i, device in enumerate(self._devices, start=1):
-            dictionary[f"device{i}"] = device.__properties__()
+            dictionary["devices"][f"device{i}"] = {
+                "class": device.__class__.__name__}
+            dictionary["devices"][f"device{i}"].update(device.__properties__())
 
         return json.dumps(dictionary, indent=4)
 
     def append(self, item: SupportedDevices):
+        item._logger = self._logger
         self._devices.append(item)
 
     @ property
@@ -119,6 +124,13 @@ class SmartHome():
 
     def set_location_id(self, location_id: int):
         self._location_id = location_id
+
+    def set_logger(self, logger: logging.Logger = None):
+        if logger is None:
+            logger = create_logger(
+                filename="smarthome.log", file_log_level=logging.INFO,
+                standard_out_log_level=logging.ERROR)
+        self._logger = logger
 
     @ property
     def name(self) -> str:
@@ -159,23 +171,3 @@ class SmartHome():
             List: A list of all devices with a matching type.
         """
         return [i for i in self._devices if i.device_type == type_]
-
-
-def device_factory(name: str = "", config: dict = None) -> SupportedDevices:
-    """Helper function to construct supported classes from class names
-    stored in the ini file.
-
-    Args:
-        name (str, optional): The name of the class to create. Defaults
-        to "".
-
-    Returns:
-        SupportedDevices: The class of device specified by name.
-    """
-    if name in SupportedDevicesString:
-        device = eval(f"{name}()")
-
-    if config is not None:
-        device.__from_json__(config)
-
-    return device
