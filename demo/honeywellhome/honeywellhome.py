@@ -52,10 +52,15 @@ def get_devices():
 
 @app.route("/devices/<device_type>", methods=["GET"])
 def get_devices_by_type(device_type):
-    if device_type == "thermostats":
-        devices = sh[{"device_type": "Thermostat"}]
-    elif device_type == "lights":
-        devices = sh[{"device_type": "Light"}]
+    path_translations = {
+        "thermostats": "Thermostat",
+        "lights": "Light",
+        "refrigerators": "Refrigerator",
+        "faucets": "Faucet",
+        "plugs": "Plug",
+        "waterheaters": "WaterHeater"
+    }
+    devices = sh[{"device_type": path_translations[device_type]}]
 
     return {
         f"device{i}": j.__api__() for (i, j) in enumerate(devices, start=1)
@@ -72,7 +77,7 @@ def do_subpath(device_type, device_id):
 
 @app.route("/locations", methods=["GET"])
 def get_locations():
-    pass
+    return str(sh)
 
 
 if __name__ == "__main__":
