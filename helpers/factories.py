@@ -6,14 +6,14 @@ from devices.lights import PhilipsHueLamp
 from devices.thermostats import NestThermostat
 # from devices.Faucet import Faucet  # Getting invalid syntax error.
 from devices.Refrigerator import Refrigerator
-from devices.water_heater import water_heater
+# from devices.water_heater import water_heater
 
 SupportedDevices = Union[
     PhilipsHueLamp,
     Refrigerator,
     NestThermostat,
     # Faucet,
-    water_heater
+    # water_heater
 ]
 
 SupportedDevicesString = [

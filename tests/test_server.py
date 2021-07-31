@@ -10,16 +10,9 @@ from demo.honeywellhome import honeywellhome
 class TestHonewellHome(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-        cls._valid_get_paths = [
-            "/", "/authorize", "/locations",
-            "/devices", "/devices/thermostats", "/devices/lights",
-            "/devices/refrigerators", "/devices/faucets",
-            "/devices/plugs", "/devices/waterheaters"]
-        cls._invalid_paths = [
-            "/nonexistent", "/nonexistent/path", "/path/does/not/exist"
-        ]
-        cls._post_paths = [
-            "/devices", "/token", "/accesstoken"
+        cls._get_paths = [
+            "/authorize", "/devices", "/devices/thermostats",
+            "/devices/thermosats/<deviceid>/fan", ""
         ]
         cls.app = honeywellhome.app.test_client()
 
