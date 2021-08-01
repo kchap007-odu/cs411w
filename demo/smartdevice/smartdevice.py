@@ -4,14 +4,14 @@ from flask import Flask
 
 # FIXME: There's no way this is the right way to handle this.
 try:
-    from devices.Thermostat import (NestThermostat,
-                                    celsius_to_kelvin,
-                                    fahrenheit_to_celsius)
+    from devices.thermostats import (NestThermostat,
+                                     celsius_to_kelvin,
+                                     fahrenheit_to_celsius)
 except ModuleNotFoundError:
     sys.path.append(os.path.dirname(__file__) + "/../..")
-    from devices.Thermostat import (NestThermostat,
-                                    celsius_to_kelvin,
-                                    fahrenheit_to_celsius)
+    from devices.thermostats import (NestThermostat,
+                                     celsius_to_kelvin,
+                                     fahrenheit_to_celsius)
 
 app = Flask(__name__)
 
