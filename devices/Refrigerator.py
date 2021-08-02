@@ -1,20 +1,43 @@
 from random import randrange
 import json
 
+from devices.devices import SmartDevice
 
-class Refrigerator:
+
+class Refrigerator(SmartDevice):
+
+    _api_return_parameters = [
+        "target_fridge_temperature",
+        "current_fridge_temperature",
+        "current_freezer_temperature",
+        "target_freezer_temperature",
+        "energy_use"
+    ]
+    _device_type = "Refrigerator"
+
+    def __init__(self, logger=None):
+        self._logger = logger
+        super().__init__()
+        self._api_return_parameters = self._api_return_parameters \
+            + super()._api_return_parameters
+
+    @ property
     def current_fridge_temperature(self):
         return randrange(30, 35)
 
+    @ property
     def target_fridge_temperature(self):
         return randrange(35, 40)
 
+    @ property
     def current_freezer_temperature(self):
         return randrange(5, 10)
 
+    @ property
     def target_freezer_temperature(self):
         return randrange(0, 4)
 
+    @ property
     def energy_use(self):
         return randrange(100, 400)
 
