@@ -1,0 +1,20 @@
+{
+    "device_type": "Thermostat",
+    "hvac_mode": "cool",
+    "previous_hvac_mode": "off",
+    "locked_temp_max": 75,
+    "locked_temp_min": 71,
+    "target_temperature_high": 75,
+    "target_temperature_low": 70,
+    "eco_temperature_high": 76,
+    "eco_temperature_low": 74,
+    "temperature_scale": "F",
+    "has_fan": true,
+    "is_locked": false,
+    "fan_timer_duration": 5,
+    "name": "Nest",
+    "location": "Upstairs",
+    "device_id": "1234",
+    "sunlight_correction_active": false,
+    "sunlight_correction_enabled": false
+}
