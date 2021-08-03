@@ -36,7 +36,7 @@ class SmartDevice:
 
     def __init__(self, name: str = "unnamed", location: str = "none",
                  device_id: Union[str, None] = None,
-                 logger: logging.Logger = None):
+                 logger: logging.Logger = logging.getLogger("dummy")):
         self.set_logger(logger)
         self.set_device_id(device_id)
         self.set_is_online(True)

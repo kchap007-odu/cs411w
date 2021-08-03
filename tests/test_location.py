@@ -1,35 +1,36 @@
 import os
 import random
 import unittest
+import json
 
 from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL  # noqa: F401
-from typing import List
+# from typing import List
 from hamcrest import assert_that, equal_to, is_, same_instance  # noqa: F401
 
-from smarthome.smarthomes import SmartHome
+from smarthome import Location
 
-from helpers.factories import SupportedDevices, device_factory
+from helpers.factories import device_factory
 from helpers.misc import json_from_file, create_logger
 
 
-class TestSmartHome(unittest.TestCase):
+class TestLocation(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
         """Perform these actions once for the entire test case.
         """
         logfile = os.path.join(os.path.dirname(
-            __file__), "logs", "test-smarthome.log")
+            __file__), "logs", "test-location.log")
         cls._debug_logger = create_logger(
             filename=logfile,
             file_log_level=INFO,
             standard_out_log_level=ERROR)
 
         cls.two_thermostats_json = os.path.normpath(os.path.join(
-            os.path.dirname(__file__), '../configs/test-two-thermostats.json'))
+            os.path.dirname(__file__), "../configs/test-two-thermostats.json"))
 
         cls.test_smart_home_json = os.path.normpath(os.path.join(
-            os.path.dirname(__file__), '../configs/test-smart-home.json'))
+            os.path.dirname(__file__), "../configs/test-location.json"))
 
         cls.test_smart_home_output_json = os.path.normpath(os.path.join(
             os.path.dirname(__file__), "../configs/test-smarthome-output.json"))
@@ -42,15 +43,12 @@ class TestSmartHome(unittest.TestCase):
     def setUp(self):
         """Perform these actions before each test.
         """
-        self.default_constructor = SmartHome(logger=self._debug_logger)
-        self.config_constructor = SmartHome(json_file=self.two_thermostats_json,
-                                            logger=self._debug_logger)
+        self.default_constructor = Location(logger=self._debug_logger)
 
     def test_constructor(self):
         """Tests default and non-default constructors.
         """
         assert_that(len(self.default_constructor), is_(equal_to(0)))
-        assert_that(len(self.config_constructor), is_(equal_to(2)))
 
     def test_add_device(self):
         """
@@ -58,7 +56,6 @@ class TestSmartHome(unittest.TestCase):
         """
 
         num_devices = random.randrange(1, 50)
-        devices: List[SupportedDevices] = []
 
         for i in range(num_devices):
             device = device_factory(random.choice(self.devices),
@@ -66,31 +63,9 @@ class TestSmartHome(unittest.TestCase):
                                         self.locations)},
                                     logger=self.default_constructor._logger)
             self.default_constructor.append(device)
-            devices.append(device)
 
         # Test __len__ and append
         assert_that(len(self.default_constructor), is_(equal_to(num_devices)))
-
-        # FIXME: Refactored smart home to be a container of locations,
-        # which is a container of devices. Location search should be
-        # done on smarthome.
-        # # Test search by location
-        # for location in self.locations:
-        #     assert_that(len(self.default_constructor[{"location": location}]),
-        #                 is_(equal_to(len([device for device in devices
-        #                                   if device.location == location]))))
-
-        # FIXME: Search by device_
-        # # Test search by device id
-        # for device in devices:
-        #     assert_that(self.default_constructor[device.device_id],
-        #                 is_(same_instance(device)))
-
-        # Test search by device type
-        for type_ in self.types:
-            assert_that(len(self.default_constructor[{"device_type": type_}]),
-                        is_(equal_to(len([device for device in devices
-                                          if device.device_type == type_]))))
 
     def test__from_json__(self):
         """
@@ -101,14 +76,17 @@ class TestSmartHome(unittest.TestCase):
         self.default_constructor.__from_json__(json_data)
         assert_that(len(self.default_constructor), is_(equal_to(3)))
 
-        with open(self.test_smart_home_output_json, "w") as f:
-            f.write(str(self.default_constructor))
+        config = json.loads(str(self.default_constructor))
+        # print(json.dumps(config, indent=4))
 
-        smart_home_from_file = SmartHome(
-            json_file=self.test_smart_home_output_json,
+        location_from_file = Location(
             logger=self._debug_logger)
-        assert_that(str(smart_home_from_file),
+        location_from_file.__from_json__(config)
+        assert_that(str(location_from_file),
                     is_(equal_to(str(self.default_constructor))))
+
+        assert_that(len(location_from_file["Thermostat"]), is_(equal_to(2)))
+        assert_that(len(location_from_file["Light"]), is_(equal_to(1)))
 
 
 if __name__ == "__main__":

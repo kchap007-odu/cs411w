@@ -65,6 +65,9 @@ class NestThermostat(SmartDevice):
         self._where_id: str = ""  # Currently unused.
         self._where_name: str = ""  # Currently unused.
 
+        self._api_return_parameters = self._api_return_parameters + \
+            super()._api_return_parameters
+
     def __properties__(self) -> dict:
         """Getter for settable parameters. Intended to be used to log
         the state of the simulated device to store in a configuration
