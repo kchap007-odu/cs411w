@@ -68,3 +68,8 @@ def json_from_file(filename: str) -> dict:
         result = json.loads(f.read())
 
     return result
+
+
+def get_device_translations():
+    pass
+    # with open("")

@@ -5,7 +5,7 @@ import string
 from typing import List
 
 # Import statement for the SmartDevice parent class
-from devices.Devices import SmartDevice
+from devices.devices import SmartDevice
 
 
 # Defines a new class, NewClass, which inherits from SmartDevice
@@ -24,7 +24,7 @@ class NewDevice(SmartDevice):
     the input should take. It is specified as:
     <name>:<type> = <default_value>
     """
-    _device_type: str = "new_device"
+    _device_type: str = "NewDevice"
     _api_return_parameters: List = [
         "new_property_a",
         "new_property_b"
@@ -46,6 +46,11 @@ class NewDevice(SmartDevice):
         """
         # Calls the constructor of the parent class, SmartDevice
         super.__init__(key1=key1, key2=key2)
+        # Appends the return parameters of the new device to the
+        # parameters specified in Devices. Python overloads addition
+        # of lists to be concatentation.
+        self._api_return_parameters = super()._api_return_parameters + \
+            self._api_return_parameters
         self.set_new_property("c")
         self.set_new_property("d")
 

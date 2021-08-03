@@ -2,26 +2,23 @@ import logging
 
 from typing import Union
 
-from devices.lights import PhilipsHueLamp
-from devices.thermostats import NestThermostat
-# from devices.Faucet import Faucet  # Getting invalid syntax error.
-from devices.Refrigerator import Refrigerator
-from devices.water_heater import water_heater
+from devices import PhilipsHueLamp, NestThermostat, Refrigerator, SmartPlugs  # noqa F401
+# from devices.water_heater import water_heater
 
 SupportedDevices = Union[
     PhilipsHueLamp,
     Refrigerator,
     NestThermostat,
     # Faucet,
-    water_heater
+    # water_heater
 ]
 
 SupportedDevicesString = [
     "PhilipsHueLamp",
     "Refrigerator",
     "NestThermostat",
-    "Faucet",
-    "water_heater"
+    # "Faucet",
+    # "water_heater"
 ]
 
 
