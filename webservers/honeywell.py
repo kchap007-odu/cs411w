@@ -51,7 +51,8 @@ class HoneywellHome(flask.Flask):
 
     def _by_device_type(self, device_type):
         devices = self._by_device()
-        return {k: v for k, v in devices.items() if v["device_type"] == device_type}
+        return {k: v for k, v in devices.items()
+                if v["device_type"] == device_type}
 
     def by_device(self):
         return jsonify(self._by_device())
