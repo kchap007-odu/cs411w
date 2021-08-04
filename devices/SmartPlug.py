@@ -15,8 +15,11 @@ class SmartPlug(SmartDevice):
     ]
 
     _power_draw_ranges = [
+        lambda: random.randint(80, 95),
         lambda: random.randint(108, 112),
-        lambda: random.randint(145, 155)
+        lambda: random.randint(145, 155),
+        lambda: random.randint(165, 175),
+        lambda: random.randint(185, 200)
     ]
 
     _device_type = "Plug"
