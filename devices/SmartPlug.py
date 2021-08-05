@@ -52,8 +52,8 @@ class SmartPlug(SmartDevice):
         return self._last_off_time.isoformat()
 
     def set_last_off_time(self, value: datetime.datetime):
-        self._last_off_time = datetime.datetime.now()
-        - datetime.timedelta(minutes=5)
+        self._last_off_time = datetime.datetime.now() \
+                              - datetime.timedelta(minutes=5)
 
     @ property
     def power_draw(self):
