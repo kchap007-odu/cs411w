@@ -1,0 +1,42 @@
+[
+    {
+    "name": "other",
+    "street_address": "1234 Test Lane",
+    "state": "VA",
+    "city": "Fredericksburg",
+    "zipcode": "56789",
+    "devices": [
+            {
+                "class": "SmartPlug",
+                "device_type": "Plug",
+                "name": "plug",
+                "device_id": "4567",
+                "location": "Desk"
+            },
+            {
+                "class": "SmartPlug",
+                "device_type": "Plug",
+                "device_id": "123",
+                "location": "Desk"
+            },
+            {
+                "class": "SmartPlug",
+                "device_type": "Plug",
+                "device_id": "234",
+                "location": "Desk"
+            }
+        ]
+},
+{
+    "name": "other",
+    "street_address": "4321 Somewhere Else Lane",
+    "state": "VA",
+    "city": "Fredericksburg",
+    "zipcode": "12345",
+    "devices": [
+        {
+            "class": "PhilipsHueLamp"
+        }
+    ]
+}
+]

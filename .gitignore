@@ -1,7 +1,9 @@
 .git
 venv/
 __pycache__/
-*/__pycache__/
+*/__pycache__
 *.log
 python-3.9.6-docs-html/
 *.pyc
+.vscode/
+# tests/*.json
