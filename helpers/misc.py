@@ -83,7 +83,16 @@ def json_from_file(filename: str) -> dict:
     return result
 
 
-def path_relative_to_root(path: str):
+def path_relative_to_root(path: str) -> str:
+    """Returns the absolute path of a path specified relative to the
+    root.
+
+    Args:
+        path (str): The root-relative path.
+
+    Returns:
+        str: The absolute path to the file.
+    """
     return os.path.normpath(
         os.path.abspath(
             os.path.join(
