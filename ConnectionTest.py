@@ -1,13 +1,19 @@
-import pyodbc
+import pymysql
 
 
-conn = pyodbc.connect('Driver={SQL Server};'
-                      'Server=sql5.freesqldatabase.com;'
-                      'Database=sql5428936;'
-                      'Trusted_Connection=yes;')
+connection = pymysql.connect(host='sql5.freesqldatabase.com', user='sql5428936',
+                             password='bARWMcterL', database='sql5428936')
 
-cursor = conn.cursor()
-cursor.execute('SELECT * FROM database_name.table')
+cursor = connection.cursor()
 
-for row in cursor:
-    print(row)
+sql_query = "SELECT VERSION()"
+
+try:
+    cursor.execute(sql_query)
+    data = cursor.fetchone()
+    print("Database version : %s" %data)
+
+except Exception as e:
+    print("Exception :", e)
+
+connection.close()
