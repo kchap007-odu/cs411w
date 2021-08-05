@@ -1,0 +1,25 @@
+[
+        {
+        "name": "Home",
+        "street_address": "1234 Test Lane",
+        "city": "Norfolk",
+        "state": "VA",
+        "zipcode": "12345-6789",
+        "devices": [
+                {
+                    "class": "PhilipsHueLamp",
+                    "device_type": "Light",
+                    "device_id": "3456",
+                    "location": "Desk",
+                    "name": "Philips Hue Lamp",
+                    "brightness": 1.0
+                },
+                {
+                    "class": "SmartPlug",
+                    "device_type": "Plug",
+                    "device_id": "4567",
+                    "location": "Desk"
+                }
+            ]
+    }
+]
