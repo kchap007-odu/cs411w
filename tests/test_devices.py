@@ -14,8 +14,8 @@ class TestDevices(unittest.TestCase):
         """Performs setup once per test case.
         """
         logfile = path_relative_to_root("logs/test-devices.log")
-        if os.exists(logfile):
-            os.delete(logfile)
+        if os.path.exists(logfile):
+            os.remove(logfile)
         cls._device_id = "1234"
         cls._name = "Device1"
         cls._location = "Hallway"

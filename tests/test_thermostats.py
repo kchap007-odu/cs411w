@@ -44,6 +44,8 @@ class TestNestThermostat(unittest.TestCase):
         """Run this setup once per test case.
         """
         logfile = path_relative_to_root("logs/test-thermostats.log")
+        if os.path.exists(logfile):
+            os.remove(logfile)
         cls._logger = create_logger(
             filename=logfile, file_log_level=DEBUG,
             standard_out_log_level=CRITICAL)

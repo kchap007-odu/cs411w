@@ -1,6 +1,7 @@
+import os
+import json
 import logging
 import unittest
-import os
 
 from hamcrest import assert_that, close_to, is_, equal_to, \
     string_contains_in_order
@@ -130,7 +131,16 @@ class TestMiscellaneousFunctions(unittest.TestCase):
         """Tests conversion of JSON file to Python dictionary.
         """
         abs_path = path_relative_to_root("configs/test-json-from-file.json")
-        pass
+        config = {"test": "value"}
+        with open(abs_path, "w") as f:
+            f.write(json.dumps(config, indent=4))
+
+        with open(abs_path, "r") as f:
+            config_from_file = json_from_file(abs_path)
+
+        os.remove(abs_path)
+
+        assert_that(config_from_file, is_(equal_to(config)))
 
     def test_get_device_translations(self):
         """Tests translation from url device name to device classes.
