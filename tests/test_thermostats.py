@@ -2,13 +2,13 @@ import unittest
 import json
 import os
 
-from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL  # noqa F401
+from logging import DEBUG, INFO, WARNING, ERROR, CRITICAL  # noqa: F401
 
 from hamcrest import assert_that, close_to, contains_string, equal_to, is_,\
     is_not, string_contains_in_order
 
 from devices.thermostats import NestThermostat
-from helpers.misc import create_logger
+from helpers.misc import create_logger, path_relative_to_root
 
 
 class TestNestThermostat(unittest.TestCase):
@@ -41,13 +41,16 @@ class TestNestThermostat(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls):
-        logfile = os.path.join(os.path.dirname(__file__),
-                               "logs", "test-thermostats.log")
+        """Run this setup once per test case.
+        """
+        logfile = path_relative_to_root("logs/test-thermostats.log")
         cls._logger = create_logger(
             filename=logfile, file_log_level=DEBUG,
             standard_out_log_level=CRITICAL)
 
     def setUp(self):
+        """Run this setup for every test.
+        """
         self.default_constructor = NestThermostat(logger=self._logger)
         self.instance_two = NestThermostat(logger=self._logger)
         self.non_default_constructor = NestThermostat(
@@ -78,6 +81,8 @@ class TestNestThermostat(unittest.TestCase):
                     is_not(self.instance_two.is_locked))
 
     def test__from_json__(self):
+        """Test ability to construct thermostat from JSON.
+        """
         for scale in self.default_constructor._temperature_scales:
             params = {"temperature_scale": scale}
             self.default_constructor.__from_json__(params)
@@ -91,8 +96,7 @@ class TestNestThermostat(unittest.TestCase):
                         is_(equal_to(hvac_mode)))
 
         # ------------ Write the file as a part of the test ------------
-        file = os.path.join(
-            os.path.dirname(__file__), "test-thermostat-properties.json")
+        file = path_relative_to_root("configs/test-thermostat-properties.json")
 
         with open(file, "w") as f:
             f.write(json.dumps(self._json_file_parameters, indent=4))
@@ -100,6 +104,8 @@ class TestNestThermostat(unittest.TestCase):
 
         with open(file, "r") as f:
             dictionary = json.loads(f.read())
+
+        os.remove(file)
 
         self.default_constructor.__from_json__(dictionary)
         for k, v in dictionary.items():
@@ -111,6 +117,8 @@ class TestNestThermostat(unittest.TestCase):
                     eval(f"self.default_constructor.{k}"), is_(equal_to(v)))
 
     def test_set_eco_temperature_high(self):
+        """Test ability to set eco temperature high.
+        """
         for scale, value in zip(self._scales, self._values):
             self.default_constructor.set_temperature_scale(scale)
             self.default_constructor.set_eco_temperature_high(value)
@@ -118,6 +126,8 @@ class TestNestThermostat(unittest.TestCase):
                         is_(close_to(value, self._tolerance)))
 
     def test_set_eco_temperature_low(self):
+        """Test ability to set eco temperature low.
+        """
         for scale, value in zip(self._scales, self._values):
             self.default_constructor.set_temperature_scale(scale)
             self.default_constructor.set_eco_temperature_low(value)
@@ -157,11 +167,15 @@ class TestNestThermostat(unittest.TestCase):
             previous = self.default_constructor.hvac_mode
 
     def test_set_is_locked(self):
+        """Test ability to lock the thermostat.
+        """
         for locked in self._boolean_values:
             self.default_constructor.set_is_locked(locked)
             assert_that(self.default_constructor.is_locked, is_(locked))
 
     def test_set_label(self):
+        """Test ability to set label.
+        """
         for label in self._labels:
             self.default_constructor.set_label(label)
             assert_that(self.default_constructor.label, is_(equal_to(label)))
@@ -169,6 +183,8 @@ class TestNestThermostat(unittest.TestCase):
                         contains_string(label))
 
     def test_set_locked_temp_max(self):
+        """Test ability to set locked max temperature.
+        """
         for scale, value in zip(self._scales, self._values):
             self.default_constructor.set_temperature_scale(scale)
             self.default_constructor.set_locked_temp_max(value)
@@ -176,6 +192,8 @@ class TestNestThermostat(unittest.TestCase):
                         is_(close_to(value, self._tolerance)))
 
     def test_set_locked_temp_min(self):
+        """Test ability to set locked min temperature.
+        """
         for scale, value in zip(self._scales, self._values):
             self.default_constructor.set_temperature_scale(scale)
             self.default_constructor.set_locked_temp_min(value)
@@ -183,12 +201,16 @@ class TestNestThermostat(unittest.TestCase):
                         is_(close_to(value, self._tolerance)))
 
     def test_set_previous_hvac_mode(self):
+        """Test ability to set previous hvac mode.
+        """
         for value in self.default_constructor._hvac_modes:
             self.default_constructor.set_previous_hvac_mode(value)
             assert_that(self.default_constructor.previous_hvac_mode,
                         is_(equal_to(value)))
 
     def test_set_sunlight_correction_active(self):
+        """Test ability to activate sunlight correction.
+        """
         for value in self._boolean_values:
             self.default_constructor.set_sunlight_correction_active(value)
             assert_that(
@@ -196,6 +218,8 @@ class TestNestThermostat(unittest.TestCase):
                 is_(equal_to(value)))
 
     def test_set_sunlight_correction_enabled(self):
+        """Test ability to enable sunlight correction.
+        """
         for value in self._boolean_values:
             self.default_constructor.set_sunlight_correction_enabled(value)
             assert_that(
@@ -203,6 +227,8 @@ class TestNestThermostat(unittest.TestCase):
                 is_(equal_to(value)))
 
     def test_set_target_temperature_high(self):
+        """Test ability to set target high temperature.
+        """
         for scale, value in zip(self._scales, self._values):
             self.default_constructor.set_temperature_scale(scale)
             self.default_constructor.set_target_temperature_high(value)
@@ -210,6 +236,8 @@ class TestNestThermostat(unittest.TestCase):
                         is_(close_to(value, self._tolerance)))
 
     def test_set_target_temperature_low(self):
+        """Test ability to set target low temperature.
+        """
         for scale, value in zip(self._scales, self._values):
             self.default_constructor.set_temperature_scale(scale)
             self.default_constructor.set_eco_temperature_low(value)
