@@ -1,41 +1,19 @@
-import pyodbc
-import json
+import pymysql
 
 
-# connect to database
-conn = pyodbc.connect('DRIVER={SQL Server}; SERVER=sql5.freesqldatabase.com@3306; DATABASE=sql5428936; UID=sql5428936; PWD=bARWMcterL')
-cursor = conn.cursor()
+connection = pymysql.connect(host='sql5.freesqldatabase.com', user='sql5428936',
+                             password='bARWMcterL', database='sql5428936')
 
-# create a record as python dictionary
+cursor = connection.cursor()
 
-record = {
+sql_query = "SELECT VERSION()"
 
-"Current Fridge Temperature": 34,
+try:
+    cursor.execute(sql_query)
+    data = cursor.fetchone()
+    print("Database version : %s" %data)
 
-"Target Fridge Temperature": 38,
+except Exception as e:
+    print("Exception :", e)
 
-"Current Freezer Temperature": 5,
-
-"Target Freezer Temperature": 0,
-
-"Energy Use": 397,
-
-"Fridge Last On Time": "22:46:34",
-
-"Fridge Last Off Time": "4:45:2",
-
-"Freezer Last On Time": "11:39:27",
-
-"Freezer Last Off Time": "14:39:37"
-
-}
-
-# insert this into database as json object
-
-cursor.execute("Insert Into refridgerator values (?)", (json.dumps(record),))
-cursor.commit()
-
-# close all connections
-
-cursor.close()
-conn.close()
+connection.close()
