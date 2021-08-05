@@ -26,7 +26,7 @@ from typing import List
 # Cool down water
 # Turn off
 
-class: WaterHeater:
+class WaterHeater:
 
 """ A smart waterheater class based on the NesThermostat class"""
 
