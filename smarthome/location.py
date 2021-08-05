@@ -34,6 +34,11 @@ class Location():
         self._devices: List[SupportedDevices] = []
 
     def __from_json__(self, json_data: dict):
+        """Sets the location information from a JSON-like object.
+
+        Args:
+            json_data (dict): The configuration to set.
+        """
         # Set up the device properties.
         available_devices = json_data.pop("devices", None)
         if available_devices is not None:
@@ -54,14 +59,16 @@ class Location():
         array position or keyword.
 
         Args:
-            key (Union[int, str]): [description]
+            key (Union[int, str]): The item to get. Addressable in list
+            or dictionary syntax.
 
         Returns:
-            SupportedDevices: [description]
+            SupportedDevices: The device(s) matching the criteria.
         """
         # Search by device id
 
-        if isinstance(key, str) and key in ["Thermostat", "Light"]:
+        if isinstance(key, str) and key in ["Thermostat", "Light", "Plug",
+                                            "Refrigerator", "WaterHeater"]:
             return [d for d in self._devices if d.device_type == key]
         elif isinstance(key, str):
             for device in self._devices:
@@ -73,16 +80,21 @@ class Location():
 
         return None
 
-    def __len__(self):
+    def __len__(self) -> int:
+        """The number of smart devices in this location.
+
+        Returns:
+            int: The number of devices.
+        """
         return len(self._devices)
 
-    # def __setitem__(self, key: Union[int, None] = None,
-    #                 value: SupportedDevices = None):
-    #     if key is not None:
-    #         self._devices[key] = value
+    def __to_json__(self) -> dict:
+        """A JSON representation of the location object.
 
-    def __to_json__(self):
-
+        Returns:
+            dict: The location information as a JSON-serializable
+            dictionary.
+        """
         dictionary = {
             "location_id": self.location_id,
             "name": self.name,
@@ -100,10 +112,20 @@ class Location():
             dictionary["devices"].append(config)
         return dictionary
 
-    def __str__(self):
+    def __str__(self) -> str:
+        """String representation of object.
+
+        Returns:
+            str: The object as a string.
+        """
         return json.dumps(self.__to_json__(), indent=4)
 
     def append(self, device: SupportedDevices):
+        """Add a new device to the list of devices.
+
+        Args:
+            device (SupportedDevices): The device to add.
+        """
         self._devices.append(device)
 
     @ property

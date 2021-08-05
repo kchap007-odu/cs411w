@@ -51,6 +51,12 @@
                 "location": "Desk",
                 "name": "Philips Hue Lamp",
                 "brightness": 1.0
+            },
+            {
+                "class": "SmartPlug",
+                "device_type": "Plug",
+                "device_id": "4567",
+                "location": "Desk"
             }
         ]
 }

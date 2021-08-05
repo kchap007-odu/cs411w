@@ -2,13 +2,16 @@ import logging
 
 from typing import Union
 
-from devices import PhilipsHueLamp, NestThermostat, Refrigerator, SmartPlugs  # noqa F401
+from devices import PhilipsHueLamp, NestThermostat, Refrigerator, \
+    SmartPlug, WaterHeater  # noqa: F401
 # from devices.water_heater import water_heater
 
 SupportedDevices = Union[
     PhilipsHueLamp,
     Refrigerator,
     NestThermostat,
+    SmartPlug,
+    WaterHeater
     # Faucet,
     # water_heater
 ]
@@ -17,6 +20,8 @@ SupportedDevicesString = [
     "PhilipsHueLamp",
     "Refrigerator",
     "NestThermostat",
+    "SmartPlug",
+    "WaterHeater"
     # "Faucet",
     # "water_heater"
 ]

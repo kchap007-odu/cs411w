@@ -1,19 +1,18 @@
 import sys
 import flask
-import os
+# import os
 # import json
 from flask import jsonify, abort
 
 from typing import List
 
 from smarthome import Location
-from helpers.misc import json_from_file
+from helpers.misc import json_from_file, path_relative_to_root
 
 
 class HoneywellHome(flask.Flask):
     def __init__(self, config_filename=None):
         super().__init__(__name__)
-        # print(config_filename)
         self._locations: List[Location] = []
         self.route("/")(self.by_location)
         self.route("/locations")(self.by_location)
@@ -29,7 +28,6 @@ class HoneywellHome(flask.Flask):
         for location in config:
             new_location = Location()
             new_location.__from_json__(location)
-            # print(new_location.name)
             self._locations.append(new_location)
 
     def __to_json__(self):
@@ -73,9 +71,8 @@ if __name__ == "__main__":
     if len(sys.argv) > 1:
         config = sys.argv[1]
     else:
-        config = "default-home.json"
+        config = "configs/default-home.json"
     # Force file to be relative to project root.
-    full_path = os.path.normpath(os.path.join(
-        os.path.dirname(sys.argv[0]), "..", config))
+    full_path = path_relative_to_root(config)
     app = HoneywellHome(full_path)
     app.run()

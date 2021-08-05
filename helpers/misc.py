@@ -1,4 +1,5 @@
 import json
+import os
 
 from typing import Union
 
@@ -22,7 +23,7 @@ def create_logger(filename: str = "default_logger.log",
     Returns:
         Logger: The logger.
     """
-    log = getLogger(__name__)
+    log = getLogger(filename)
     log.setLevel(file_log_level)
     formatter = Formatter(
         '%(asctime)s - %(filename)s - %(lineno)s - %(levelname)s - %(message)s')
@@ -40,7 +41,19 @@ def create_logger(filename: str = "default_logger.log",
 
 
 def log_message_formatter(get_set: str, device_id: str, property_:
-                          str, value: Union[str, int] = None):
+                          str, value: Union[str, int] = None) -> str:
+    """Formats get and set messages to be written to the log.
+
+    Args:
+        get_set (str): Whether variable is being get or set. Must be
+        "get" or "set".
+        device_id (str): The identifier of the device.
+        property_ (str): The name of the property being get/set.
+        value (Union[str, int], optional): The value being . Defaults to None.
+
+    Returns:
+        str: [description]
+    """
     if isinstance(value, str):
         value = f"'{value}'"
 
@@ -68,6 +81,25 @@ def json_from_file(filename: str) -> dict:
         result = json.loads(f.read())
 
     return result
+
+
+def path_relative_to_root(path: str) -> str:
+    """Returns the absolute path of a path specified relative to the
+    root.
+
+    Args:
+        path (str): The root-relative path.
+
+    Returns:
+        str: The absolute path to the file.
+    """
+    return os.path.normpath(
+        os.path.abspath(
+            os.path.join(
+                os.path.dirname(__file__), "..", path
+            )
+        )
+    )
 
 
 def get_device_translations():
