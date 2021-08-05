@@ -14,43 +14,45 @@ except ModuleNotFoundError:
 
 
 app = Flask(__name__)
-config_name = os.path.join(os.path.abspath(
-    os.path.dirname(__file__)), "home-1.json")
+config_name = os.path.normpath(os.path.join(os.path.abspath(
+    os.path.dirname(__file__)), "../../configs/home-1.json"))
 sh = SmartHome(json_file=config_name)
 
 # --------------------------- AUTHORIZATION -------------------------- #
 
 
-@app.route("/accesstoken", methods=["POST"])
+@ app.route("/accesstoken", methods=["POST"])
 def get_access_token():
     return "Here's your access token: 1234"
 
 
-@app.route("/authorize", methods=["GET"])
+@ app.route("/authorize", methods=["GET"])
 def get_authorization():
     return "authorization code"
 
 
-@app.route("/token", methods=["POST"])
+@ app.route("/token", methods=["POST"])
 def get_token():
     return "here's your token: O"
 
 # ---------------------------- DEVICES ------------------------------- #
 
 
-@app.route("/")
+@ app.route("/")
 def get_config():
     return json.loads(str(sh))
 
 
-@app.route("/devices", methods=['GET', 'POST'])
+@ app.route("/devices", methods=['GET', 'POST'])
 def get_devices():
+    # if request.method == "POST":
+    # print("Posted")
     return {
         f"device{i}": j.__api__() for (i, j) in enumerate(sh._devices, start=1)
     }
 
 
-@app.route("/devices/<device_type>", methods=["GET"])
+@ app.route("/devices/<device_type>", methods=["GET"])
 def get_devices_by_type(device_type):
     path_translations = {
         "thermostats": "Thermostat",
@@ -67,7 +69,7 @@ def get_devices_by_type(device_type):
     }
 
 
-@app.route("/devices/<device_type>/<device_id>", methods=["GET"])
+@ app.route("/devices/<device_type>/<device_id>", methods=["GET"])
 def do_subpath(device_type, device_id):
     device = sh[device_id]
     device._ambient_temperature = random.randint(293, 300)
@@ -75,7 +77,7 @@ def do_subpath(device_type, device_id):
     return device.__api__()
 
 
-@app.route("/locations", methods=["GET"])
+@ app.route("/locations", methods=["GET"])
 def get_locations():
     return str(sh)
 

@@ -1,5 +1,13 @@
-from flask import requests
+import pyodbc
 
 
-response = requests.get("http://127.0.0.1:5000/devices")
-response.json()
+conn = pyodbc.connect('Driver={SQL Server};'
+                      'Server=sql5.freesqldatabase.com;'
+                      'Database=sql5428936;'
+                      'Trusted_Connection=yes;')
+
+cursor = conn.cursor()
+cursor.execute('SELECT * FROM database_name.table')
+
+for row in cursor:
+    print(row)

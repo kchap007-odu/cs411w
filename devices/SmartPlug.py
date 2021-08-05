@@ -1,35 +1,74 @@
 import random
+import datetime
+import logging
+
+from devices.devices import SmartDevice
 
 
-class SmartPlugs:
-    Status = ["on", "off"]
+class SmartPlug(SmartDevice):
+
+    _api_return_parameters = [
+        "power_draw",
+        "is_on",
+        "last_on_time",
+        "last_off_time"
+    ]
+
+    _power_draw_ranges = [
+        lambda: random.randint(80, 95),
+        lambda: random.randint(108, 112),
+        lambda: random.randint(145, 155),
+        lambda: random.randint(165, 175),
+        lambda: random.randint(185, 200)
+    ]
+
+    _device_type = "Plug"
+
+    def __init__(self, logger: logging.Logger = logging.getLogger("dummy")):
+        super().__init__(logger=logger)
+        self._pick_power_range()
+        self.set_is_on()
+        self.set_last_on_time(datetime.datetime.now())
+        self.set_last_off_time(datetime.datetime.now())
+        self._api_return_parameters = super()._api_return_parameters + \
+            self._api_return_parameters
+
+    @ property
+    def is_on(self):
+        return self._is_on
+
+    def set_is_on(self, value: bool = False):
+        self._is_on = value
+
+    @ property
+    def last_on_time(self):
+        return self._last_on_time.isoformat()
+
+    def set_last_on_time(self, value: datetime.datetime):
+        self._last_on_time = datetime.datetime.now()
+
+    @ property
+    def last_off_time(self):
+        return self._last_off_time.isoformat()
+
+    def set_last_off_time(self, value: datetime.datetime):
+        self._last_off_time = datetime.datetime.now()
+        - datetime.timedelta(minutes=5)
+
+    @ property
+    def power_draw(self):
+        return self._power_range()
+
+    def _pick_power_range(self):
+        self._power_range = random.choice(self._power_draw_ranges)
 
 
-    def simulate_consumption(self):
-        while self.Status == "on":
-            connected_device = ["fan", "Tv", "sound_system", "pressing_iron", "lamp"]
-            for device in connected_device:
-                if device.index() == "fan":
-                    power_rate = 75
-                    duration = random.randint(18, 24)
-                    energy_consumption = power_rate * duration
-                elif device.index() == "Tv":
-                    power_rate = 150
-                    duration = random.randint(22, 24)
-                    energy_consumption = power_rate * duration
-                elif device.index() == "sound_system":
-                    power_rate = 120
-                    duration = random.randint(22, 24)
-                    energy_consumption = power_rate * duration
-                elif device.index() == "pressing_iron":
-                    power_rate = 110
-                    duration = random.randint(8, 10)
-                    energy_consumption = power_rate * duration
-                elif device.index() == "lamp":
-                    power_rate = 60
-                    duration = random.randint(16,18)
-                    energy_consumption = power_rate * duration
+if __name__ == "__main__":
+    sp = SmartPlug()
+    print(sp.last_on_time)
+    print(sp.last_off_time)
+    print(sp.is_on)
+    for i in range(1, 5):
+        print(sp.power_draw)
 
-        return energy_consumption
-
-
+    print(sp.__properties__())
