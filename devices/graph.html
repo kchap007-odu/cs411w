@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lan = en >
+<head>
+    <meta charset = 'UTF-8'>
+    <meta name = "viewport" content= "width = device-width, initial-scale = 1.0">
+    <title> Smart Plug analysis </title>
+    <script src = "https://cdn.jsdelivr.net/npn/chart.js@2.9.4/dist/chart.min.js"> </script>
+</head>
+<body>
+    <canvas id = "lineChart" width="800" height="400">
+    </canvas>
+    <script>
+        var ctx = document.getElementById("lineChart").getContext("2d");
+    </script>
+    <script>
+        var = lineChart = new Chart(ctx, {
+        type: "line",
+        data: {
+            labels: {{ labels | safe }},
+            dataset: [
+                {
+                    label: "Data points",
+                    data: {{ values | safe }},
+                    fill: false,
+                    borderColor: "rgb(75, 92, 92)",
+                    lineTension: 0.1
+                }
+
+             ]
+
+         },
+            options: {
+                responsive: false
+                }
+        );
+    </script>
+</body>
+
+</html>
