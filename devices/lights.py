@@ -7,10 +7,16 @@ from devices.devices import SmartDevice
 class PhilipsHueLamp(SmartDevice):
 
     _device_type = "Light"
+    _api_return_parameters = [
+        "brightness",
+        "rgb_color"
+    ]
 
     def __init__(self, location: str = "none", name: str = "none",
                  logger: logging.Logger = None):
         super().__init__(location=location, name=name, logger=logger)
+        self._api_return_parameters = super()._api_return_parameters + \
+            self._api_return_parameters
 
         self.set_rgb_color([255, 255, 255])
         self.set_brightness(1.0)
