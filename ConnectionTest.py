@@ -28,7 +28,4 @@ for item in json_obj:
                                                          Target_Freezer_Temp, E_Use, Fridge_Last_On, Fridge_Last_Off,
                                                          Freezer_Last_On, Freezer_Last_Off))
 connection.commit()
-
 connection.close()
-
-# works and prints out Database version : 5.5.62-0ubuntu0.14.04.1
