@@ -38,16 +38,23 @@
             {
                 "class": "SmartPlug",
                 "device_type": "Plug",
-                "device_id": "4567",
+                "device_id": "3456",
                 "location": "Desk",
                 "name": "Lamp"
             },
             {
                 "class": "Refrigerator",
                 "device_type": "Refrigerator",
-                "device_id": "5678",
+                "device_id": "4567",
                 "location": "Kitchen",
                 "name": "Samsung"
+            },
+            {
+                "class": "WaterHeater",
+                "device_type": "Waterheater",
+                "name": "Heater",
+                "location": "Basement",
+                "device_id": "5678"
             }
         ]
 },
