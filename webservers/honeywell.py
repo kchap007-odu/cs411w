@@ -1,8 +1,7 @@
 import sys
 import flask
-# import os
-# import json
-from flask import jsonify, abort
+
+from flask import jsonify, abort, request
 
 from typing import List
 
@@ -59,6 +58,13 @@ class HoneywellHome(flask.Flask):
         return jsonify(self._by_device_type(device_type))
 
     def by_device_id(self, device_type, device_id):
+
+        if request.method == "POST":
+            for location in self._locations:
+                for device in location._devices:
+                    if device["device_id"] == device_id:
+                        device.__from_json__(request.json)
+
         devices = self._by_device_type(device_type)
         for k, v in devices.items():
             if v["device_id"] == device_id:

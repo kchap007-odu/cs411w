@@ -28,30 +28,9 @@
                 "sunlight_correction_active": false
             },
             {
-                "class": "NestThermostat",
-                "device_type": "Thermostat",
-                "hvac_mode": "cool",
-                "previous_hvac_mode": "off",
-                "target_temperature_high": 20,
-                "target_temperature_low": 15,
-                "locked_temp_max": 17,
-                "locked_temp_min": 13,
-                "eco_temperature_high": 16,
-                "eco_temperature_low": 15,
-                "temperature_scale": "C",
-                "has_fan": true,
-                "is_locked": false,
-                "fan_timer_duration": 5,
-                "name": "Nest",
-                "location": "Downstairs",
-                "device_id": "2345",
-                "sunlight_correction_enabled": true,
-                "sunlight_correction_active": true
-            },
-            {
                 "class": "PhilipsHueLamp",
                 "device_type": "Light",
-                "device_id": "3456",
+                "device_id": "2345",
                 "location": "Desk",
                 "name": "Philips Hue Lamp",
                 "brightness": 1.0

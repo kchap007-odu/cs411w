@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 def plot_graph(Temp_xAxis, Mean_yAxis):
     plt.bar(Temp_xAxis, Mean_yAxis)
     plt.title('Mean')
-    plt.xticks(rotation=45)
+    plt.xticks(rotation=10)
     plt.show()
 
 
