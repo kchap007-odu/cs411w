@@ -1,4 +1,4 @@
-import datetime
+from datetime import datetime
 import random
 import logging
 import time
@@ -29,7 +29,7 @@ from typing import List, Union
 # Turn off
 
 
-class WaterHeater:
+class WaterHeater(SmartDevice):
 
     """ A smart waterheater class based on the NesThermostat class"""
 

@@ -4,12 +4,12 @@ import os
 from typing import Union
 
 from logging import getLogger, Formatter, FileHandler, StreamHandler, \
-    Logger, WARNING, DEBUG
+    Logger, WARNING, DEBUG, ERROR  # noqa: F401
 
 
 def create_logger(filename: str = "default_logger.log",
                   file_log_level: int = DEBUG,
-                  standard_out_log_level: int = WARNING) -> Logger:
+                  standard_out_log_level: int = ERROR) -> Logger:
     """Create a logger.
 
     Args:
